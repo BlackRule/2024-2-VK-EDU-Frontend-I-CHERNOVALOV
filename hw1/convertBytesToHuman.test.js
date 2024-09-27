@@ -26,6 +26,7 @@ test('Возвращает корректное значение для чисе
   expect(convertBytesToHuman(1023)).toBe('1023 B')
   expect(convertBytesToHuman(1024)).toBe('1 KB')
   expect(convertBytesToHuman(123123123)).toBe('117.42 MB')
+  expect(convertBytesToHuman(Math.trunc(117.4*1024**2))).toBe('117.4 MB')
   expect(convertBytesToHuman(1610612736)).toBe('1.5 GB')
   //todo Add TB PB EB ZB YB
   //max pre BigInt

@@ -16,12 +16,7 @@
  */
 //todo add BigInt support
 export default function convertBytesToHuman(bytes) {
-  if ((typeof bytes) !== 'number') return false;
-  //NaN? -> false
-  if (bytes !== bytes) return false;
-  //not int-like? -> false
-  if (Math.trunc(bytes) !== bytes) return false;
-  if (bytes < 0 || bytes === Infinity) return false;
+  if ((typeof bytes) !== 'number' || !Number.isInteger(bytes) || bytes < 0) return false;
   const prefixes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
   let prefixIndex = Math.floor(Math.log2(bytes) / 10);
   if (prefixIndex === -Infinity) prefixIndex = 0

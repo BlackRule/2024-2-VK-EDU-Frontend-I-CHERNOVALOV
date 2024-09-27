@@ -25,6 +25,7 @@ nonUniqueElements([10, 9, 10, 10, 9, 8]) == [10, 9, 10, 10, 9]
  */
 
 export default function nonUniqueElements(data) {
+  if(!Array.isArray(data)) throw new Error('!Array.isArray(data)')
   const counts = new Map()
   for (const el of data) {
     counts.set(el, 0)
@@ -33,8 +34,9 @@ export default function nonUniqueElements(data) {
     counts.set(el, counts.get(el) + 1)
   }
   const result = []
-  for (const el of data)
+  for (const el of data) {
     if (counts.get(el) > 1) result.push(el)
+  }
 
   return result
 }

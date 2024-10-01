@@ -1,0 +1,96 @@
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+.material-symbols-outlined {
+    cursor: pointer;
+}
+
+html {
+    box-sizing: border-box;
+    height: 99%;
+}
+
+body {
+    margin: 0;
+    background-color: #fff;
+    color: #333;
+    font-size: 15px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.screen {
+    max-width: 320px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    background-color: #8e24aa;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.topbar .avatar {
+    background-color: white;
+    color: #333333;
+    border-radius: 50%;
+}
+
+.topbar .vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar .last-seen {
+    font-size: 0.8em;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 500px;
+    overflow-y: scroll;
+    background-color: aliceblue;
+}
+
+.message {
+    border-radius: 10px;
+    margin: 4px;
+    padding: 4px;
+    background-color: white;
+}
+
+.message .top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form {
+    display: flex;
+    border: 1px solid rgba(25, 25, 25, 0.32);
+}
+
+input[type=submit] {
+    visibility: collapse;
+}
+
+input {
+    border: 0;
+    outline: none;
+    width: calc(100% - 2px);
+}

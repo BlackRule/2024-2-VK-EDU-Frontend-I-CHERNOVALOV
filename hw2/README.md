@@ -1,0 +1,1 @@
+simultaneous use in multiple tabs is not supported

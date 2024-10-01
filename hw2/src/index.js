@@ -1,3 +1,4 @@
+import './index.css';
 const default_data = [
     {
         name: "Дженнифер",

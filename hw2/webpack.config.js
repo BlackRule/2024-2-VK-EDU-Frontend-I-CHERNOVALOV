@@ -34,16 +34,7 @@ module.exports = {
                 ],
             },
             {
-                test: /shadow\.css$/,
-                include: SRC_PATH,
-                use: [
-                    {
-                        loader: 'css-loader'
-                    },
-                ],
-            },
-            {
-                test: /index\.css$/,
+                test: /\.css$/,
                 include: SRC_PATH,
                 use: [
                     {
@@ -58,7 +49,7 @@ module.exports = {
     },
     plugins: [
         new MiniCSSExtractPlugin({
-            filename: 'style.css',
+            filename: '[name].css',
         }),
         new HTMLWebpackPlugin({
             filename: 'index.html',

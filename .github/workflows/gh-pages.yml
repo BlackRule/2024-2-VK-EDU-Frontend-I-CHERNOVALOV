@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} is rolling out a new version of the app 🚀
 on: [push]
 jobs:
   Build-and-Deploy:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

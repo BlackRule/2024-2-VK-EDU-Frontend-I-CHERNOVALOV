@@ -1,13 +1,14 @@
 'use strict';
 
 const path = require('path');
-
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 
 const SRC_PATH = path.resolve(__dirname, 'src');
 const BUILD_PATH = path.resolve(__dirname, 'build');
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = {
     context: SRC_PATH,
@@ -37,23 +38,29 @@ module.exports = {
                 test: /\.css$/,
                 include: SRC_PATH,
                 use: [
-                    {
-                        loader: MiniCSSExtractPlugin.loader,
-                    },
-                    {
-                        loader: 'css-loader',
-                    },
+                    isDevelopment ? 'style-loader' : MiniCSSExtractPlugin.loader,
+                    'css-loader',
                 ],
             },
         ],
     },
     plugins: [
-        new MiniCSSExtractPlugin({
-            filename: '[name].css',
-        }),
         new HTMLWebpackPlugin({
             filename: 'index.html',
             template: './index.html'
-        })
-    ]
+        }),
+        ...(!isDevelopment ? [
+                new MiniCSSExtractPlugin({
+                    filename: '[name].css',
+                })
+            ] : [])
+    ],
+    devServer: {
+        static: {
+            directory: BUILD_PATH,
+        },
+        hot: true,
+        port: 3000,
+        open: true
+    }
 };

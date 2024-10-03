@@ -28,15 +28,34 @@ const messages = document.querySelector('.messages');
 const messagesScroll = document.querySelector('.messages-scroll');
 
 function addMessage(message) {
-    messages.innerHTML += `
-<div class="message${message.name === 'Иван' ? ' my' : ''}">
-  <div class="top">
-    <div class="name">${message.name}</div>
-    <div class="time">${message.time}</div>
-  </div>
-    <div class="text">${message.text.replaceAll('\n', '<br>')}</div>
-</div>
-`
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    if (message.name === 'Иван') {
+        messageDiv.classList.add('my');
+    }
+
+    const topDiv = document.createElement('div');
+    topDiv.classList.add('top');
+
+    const nameDiv = document.createElement('div');
+    nameDiv.classList.add('name');
+    nameDiv.textContent = message.name;
+
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('time');
+    timeDiv.textContent = message.time;
+
+    const pre = document.createElement('pre');
+    pre.classList.add('text');
+    pre.textContent = message.text;
+
+    topDiv.appendChild(nameDiv);
+    topDiv.appendChild(timeDiv);
+    messageDiv.appendChild(topDiv);
+    messageDiv.appendChild(pre);
+
+    messages.appendChild(messageDiv);
+
     messagesScroll.scrollTop = messagesScroll.scrollHeight;
 }
 

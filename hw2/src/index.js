@@ -54,7 +54,8 @@ function sendMessage() {
     }));
 }
 
-function autosize(textarea, row_limit) {
+function autosize(textarea, row_limit, onAfterResize = function () {
+}) {
     // Set default for row_limit parameter
     row_limit = parseInt(row_limit ?? '5');
     if (!row_limit) {
@@ -111,6 +112,7 @@ function autosize(textarea, row_limit) {
 
         // Set the calculated rows attribute (limited by row_limit)
         textarea.setAttribute("rows", "" + Math.min(rows, row_limit));
+        onAfterResize()
     });
 
     // Trigger the event to set the initial rows value
@@ -143,4 +145,4 @@ document.getElementById('send').addEventListener('click', sendMessage);
 
 addEventListener('unload', () => localStorage.setItem('messages', JSON.stringify(data)))
 
-autosize(textarea, 10)
+autosize(textarea, 10, () => messagesScroll.scrollTop = messagesScroll.scrollHeight)

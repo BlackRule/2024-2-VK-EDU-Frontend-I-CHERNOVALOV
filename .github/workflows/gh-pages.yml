@@ -14,11 +14,11 @@ jobs:
     - name: Install npm deps
       working-directory: ./hw2
       run: npm i
-    - name: Build app
-      working-directory: ./hw2
-      run: npm run build
+#    - name: Build app
+#      working-directory: ./hw2
+#      run: npm run build
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./hw2/build
+        publish_dir: ./hw2/src

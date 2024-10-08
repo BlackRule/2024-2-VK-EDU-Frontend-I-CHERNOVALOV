@@ -16,7 +16,7 @@ function Chat({name,text,image_attachment_alt,time,state,image,count}){
     if(image_attachment_alt!==undefined)
         text=`<span class="material-symbols-outlined" style="color: #50b052">photo_camera</span> ${image_attachment_alt}`
     return `
-<a class="chat" href="/screens/chat.html">
+<a class="chat" href="screens/chat.html">
     <img src="${image}" alt="avatar">
     <div class="body">
         <div class="top">

@@ -43,14 +43,14 @@ function addMessage(message) {
     timeDiv.classList.add('time');
     timeDiv.textContent = message.time;
 
-    const pre = document.createElement('pre');
-    pre.classList.add('text');
-    pre.textContent = message.text;
+    const text = document.createElement('div');
+    text.classList.add('text');
+    text.textContent = message.text;
 
     topDiv.appendChild(nameDiv);
     topDiv.appendChild(timeDiv);
     messageDiv.appendChild(topDiv);
-    messageDiv.appendChild(pre);
+    messageDiv.appendChild(text);
 
     messages.appendChild(messageDiv);
 

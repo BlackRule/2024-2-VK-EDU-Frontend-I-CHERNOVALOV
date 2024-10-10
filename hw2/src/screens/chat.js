@@ -1,7 +1,7 @@
 const default_data = [
     {
         name: "Дженнифер",
-        text: "Я тут кое-что нарисовала... Посмотри как будет время...",
+        text: "Я тут кое-что нарисовала...\nПосмотри как будет время...",
         time: "10:53"
     },
     {
@@ -16,7 +16,7 @@ const default_data = [
     },
     {
         name: "Иван",
-        text: "Джен, ты молодец!",
+        text: "Джен, ты молодеееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееец!",
         time: "10:53"
     },
 
@@ -43,14 +43,14 @@ function addMessage(message) {
     timeDiv.classList.add('time');
     timeDiv.textContent = message.time;
 
-    const pre = document.createElement('pre');
-    pre.classList.add('text');
-    pre.textContent = message.text;
+    const text = document.createElement('div');
+    text.classList.add('text');
+    text.textContent = message.text;
 
     topDiv.appendChild(nameDiv);
     topDiv.appendChild(timeDiv);
     messageDiv.appendChild(topDiv);
-    messageDiv.appendChild(pre);
+    messageDiv.appendChild(text);
 
     messages.appendChild(messageDiv);
 

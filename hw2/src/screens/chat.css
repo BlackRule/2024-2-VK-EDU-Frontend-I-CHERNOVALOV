@@ -26,14 +26,15 @@
 .messages-scroll {
     overflow-y: scroll;
     background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .messages{
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    min-height: 100%;
-    /*max-height: 500px;*/
+    flex-grow: 1;
 }
 
 .message {

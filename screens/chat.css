@@ -42,6 +42,7 @@
     padding: 4px;
     background-color: white;
     align-self: flex-start;
+    max-width: 100%;
 }
 
 .message.my{
@@ -54,7 +55,8 @@
 }
 
 .message .text{
-    white-space: break-spaces;
+    white-space: preserve-breaks;
+    word-break: break-word;
 }
 
 .form {

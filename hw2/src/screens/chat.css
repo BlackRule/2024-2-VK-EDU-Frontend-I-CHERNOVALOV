@@ -1,0 +1,81 @@
+.material-symbols-outlined {
+    cursor: pointer;
+}
+
+.topbar .avatar {
+    background-color: white;
+    color: #333333;
+    border-radius: 50%;
+}
+
+.topbar .vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar .last-seen {
+    font-size: 0.8em;
+}
+
+.horizontal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.messages-scroll {
+    overflow-y: scroll;
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.messages{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.message {
+    border-radius: 10px;
+    margin: 4px;
+    padding: 4px;
+    background-color: white;
+    align-self: flex-start;
+    max-width: 100%;
+}
+
+.message.my{
+    align-self: flex-end;
+}
+
+.message .top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.message .text{
+    white-space: preserve-breaks;
+    word-break: break-word;
+}
+
+.form {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(25, 25, 25, 0.32);
+}
+
+input[type=submit] {
+    visibility: collapse;
+}
+
+textarea {
+    border: 0;
+    outline: none;
+    width: calc(100% - 2px);
+    font-family: sans-serif;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: .375rem;
+}

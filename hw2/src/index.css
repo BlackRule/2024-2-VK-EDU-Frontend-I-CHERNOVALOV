@@ -1,9 +1,15 @@
-.title{
+.title {
     flex-grow: 1;
     text-align: left;
     margin-left: 26px;
 
 }
-#chats{
+
+.topbar .material-symbols-outlined:hover {
+    color: #fbd767;
+    cursor: pointer;
+}
+
+#chats {
     overflow-y: scroll;
 }

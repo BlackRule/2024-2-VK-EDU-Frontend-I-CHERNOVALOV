@@ -2,25 +2,34 @@
     cursor: pointer;
 }
 
+.material-symbols-outlined:hover {
+    color: #fbd767;
+}
+
 .topbar .avatar {
     background-color: white;
     color: #333333;
     border-radius: 50%;
 }
 
-.topbar .vertical {
-    display: flex;
-    flex-direction: column;
-}
-
-.topbar .last-seen {
-    font-size: 0.8em;
-}
-
 .horizontal {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.topbar .horizontal:hover {
+    background-color: rgba(221, 221, 221, 0.27);
+}
+
+.topbar .vertical {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.topbar .last-seen {
+    font-size: 0.8em;
 }
 
 .messages-scroll {
@@ -31,7 +40,7 @@
     flex-grow: 1;
 }
 
-.messages{
+.messages {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -43,11 +52,37 @@
     padding: 4px;
     background-color: white;
     align-self: flex-start;
-    max-width: 100%;
+    max-width: 50%;
 }
 
-.message.my{
+@keyframes appear {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.message.new {
+    animation-name: appear;
+    transform-origin: left bottom;
+    animation-duration: 0.3s;
+    animation-timing-function: linear;
+}
+
+@media (max-width: 640px) {
+    .message {
+        max-width: calc(100% - 30px);
+    }
+}
+
+.message.my {
     align-self: flex-end;
+}
+
+.message.my.new {
+    transform-origin: right bottom;
 }
 
 .message .top {
@@ -55,7 +90,7 @@
     justify-content: space-between;
 }
 
-.message .text{
+.message .text {
     white-space: preserve-breaks;
     word-break: break-word;
 }
@@ -75,7 +110,7 @@ textarea {
     outline: none;
     width: calc(100% - 2px);
     font-family: sans-serif;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding: .375rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding: .375rem;
 }

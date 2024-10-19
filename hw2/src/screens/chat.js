@@ -25,35 +25,19 @@ const textarea = document.querySelector('.form-input');
 const messages = document.querySelector('.messages');
 const messagesScroll = document.querySelector('.messages-scroll');
 
-function addMessage(message) {
+function addMessage(message,isNew=false) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
-    if (message.name === 'Иван') {
-        messageDiv.classList.add('my');
-    }
-
-    const topDiv = document.createElement('div');
-    topDiv.classList.add('top');
-
-    const nameDiv = document.createElement('div');
-    nameDiv.classList.add('name');
-    nameDiv.textContent = message.name;
-
-    const timeDiv = document.createElement('div');
-    timeDiv.classList.add('time');
-    timeDiv.textContent = message.time;
-
-    const text = document.createElement('div');
-    text.classList.add('text');
-    text.textContent = message.text;
-
-    topDiv.appendChild(nameDiv);
-    topDiv.appendChild(timeDiv);
-    messageDiv.appendChild(topDiv);
-    messageDiv.appendChild(text);
-
+    if (message.name === 'Иван') messageDiv.classList.add('my');
+    if (isNew) messageDiv.classList.add('new');
+    messageDiv.innerHTML = `
+        <div class="top">
+            <div class="name">${message.name}</div>
+            <div class="time">${message.time}</div>
+        </div>
+        <div class="text">${message.text}</div>
+    `;
     messages.appendChild(messageDiv);
-
     messagesScroll.scrollTop = messagesScroll.scrollHeight;
 }
 
@@ -63,7 +47,7 @@ function sendMessage() {
     const minutes = `${date.getMinutes()}`.padStart(2, '0');
     let text = textarea.value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     let message = {name: "Иван", time: `${hours}:${minutes}`, text: text};
-    addMessage(message);
+    addMessage(message,true);
     data.push(message);
     textarea.value = '';
     textarea.dispatchEvent(new Event('input', {

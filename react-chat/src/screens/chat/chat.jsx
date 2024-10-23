@@ -150,7 +150,10 @@ function Chat({switchScreenTo}) {
                 }
                 const d = new_height - curTextareaHeightRef.current;
                 if(d===0) return;
-                console.log(d)
+                const st=messagesScroll.scrollTop
+                messagesScroll.scrollTop+=10
+                if(Math.abs(st-messagesScroll.scrollTop)<3 && d<0) return;
+                else messagesScroll.scrollTop-=10
                 messagesScroll.scrollTop += d;
                 curTextareaHeightRef.current=new_height
             }

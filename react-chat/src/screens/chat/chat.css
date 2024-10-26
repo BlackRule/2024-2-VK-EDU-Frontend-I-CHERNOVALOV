@@ -36,14 +36,15 @@
     overflow-y: scroll;
     background-color: aliceblue;
     display: flex;
-    flex-direction: column;
+    /* меняем отображение сообщений по привычному ux/ui снизу вверх */
+    flex-direction: column-reverse;
     flex-grow: 1;
 }
 
 .messages {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    /* flex-grow: 1; */
 }
 
 .message {

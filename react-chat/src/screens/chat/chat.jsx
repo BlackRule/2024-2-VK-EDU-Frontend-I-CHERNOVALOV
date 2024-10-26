@@ -91,7 +91,6 @@ function Chat({switchScreenTo}) {
     const [data, setData] = useState(t)
     const dataToSave = useRef([]);
     const autosizeFnThatNeedsCleanup = useRef(null);
-    const curTextareaHeightRef = useRef(null);
 
     useEffect(() => {
         if(textareaRef.current===null) return
@@ -142,22 +141,11 @@ function Chat({switchScreenTo}) {
         };
 
         window.addEventListener('unload', unloadHandler)
-        autosizeFnThatNeedsCleanup.current=autosize(textarea, 10,
-            (new_height) => {
-                if(curTextareaHeightRef.current===null) {
-                    curTextareaHeightRef.current=new_height
-                    return
-                }
-                const d = new_height - curTextareaHeightRef.current;
-                if(d===0) return;
-                const st=messagesScroll.scrollTop
-                messagesScroll.scrollTop+=10
-                if(Math.abs(st-messagesScroll.scrollTop)<3 && d<0) return;
-                else messagesScroll.scrollTop-=10
-                messagesScroll.scrollTop += d;
-                curTextareaHeightRef.current=new_height
-            }
-        )
+        autosizeFnThatNeedsCleanup.current=autosize(textarea, 10, () => {
+            // если надо чтобы при вводе был всегда подскролл внизу
+            if (!messagesScrollRef.current) return
+            messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight
+        })
         return () => {
             textarea.removeEventListener('input', autosizeFnThatNeedsCleanup.current)
             window.removeEventListener('unload', unloadHandler)

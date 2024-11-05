@@ -1,14 +1,14 @@
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 const c={
+  base: '/2024-2-VK-EDU-Frontend-I-Chernovalov',
   plugins: [react()],
-  base: "/2024-2-VK-EDU-Frontend-I-Chernovalov",
   resolve: {
     alias: {
-      'screens': '/src/screens',
       'components': '/src/components',
+      'screens': '/src/screens',
     },
   },
 }

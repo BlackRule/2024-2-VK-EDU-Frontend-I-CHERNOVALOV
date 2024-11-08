@@ -1,10 +1,9 @@
-import 'screens/screen.css'
-import 'components/topbar.css'
-import './chats.css'
-import './components/compose.css'
 import {SwitchScreenTo} from '@/types.ts'
+import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
+import Topbar from 'components/Topbar/Topbar.tsx'
 import Screen from 'screens/Screen.jsx'
-import Chat from './components/chat.jsx'
+import Chat from './components/Chat.tsx'
+import styles from './Chats.module.scss'
 
 function Chats({switchScreenTo}:{switchScreenTo:SwitchScreenTo}) {
   const data = {
@@ -68,18 +67,18 @@ function Chats({switchScreenTo}:{switchScreenTo:SwitchScreenTo}) {
 
   return (
     <Screen>
-      <div className="topbar">
-        <span className="material-symbols-outlined">menu</span>
-        <span className="title">Messenger</span>
-        <span className="material-symbols-outlined">search</span>
-      </div>
-      <div id="chats">
+      <Topbar>
+        <MaterialSymbol symbol='menu'/>
+        <span className={styles.title}>Messenger</span>
+        <MaterialSymbol symbol='search'/>
+      </Topbar>
+      <div className={styles.chats}>
         {
           data.chats.map((chat) =>
             <Chat key={chat.id} {...chat} id={chat.id} {...{switchScreenTo}}/>)
         }
       </div>
-      <span className="material-symbols-outlined compose">edit</span>
+      <MaterialSymbol symbol='edit' className={styles.compose} hoverable={false}/>
     </Screen>
   )
 }

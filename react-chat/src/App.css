@@ -6,14 +6,6 @@
     padding: 0;
 }
 
-.material-symbols-outlined {
-    user-select: none;
-    font-variation-settings: 'FILL' 1,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24
-}
-
 html {
     box-sizing: border-box;
     height: 99%;

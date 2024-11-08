@@ -1,5 +1,5 @@
-import path from "path";
 //todo sort scss props
+const {resolve} = require('node:path')
 module.exports = {
   env: {
     browser: true,
@@ -22,6 +22,7 @@ module.exports = {
     {
       files: ['*.json'],
       rules: {
+        '@typescript-eslint/no-unused-expressions': 'off',
         'comma-dangle': ['error', 'never'],
         quotes: ['warn', 'double'],
       },
@@ -76,7 +77,7 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
-        project: path.resolve('./tsconfig.app.json'),
+        project: resolve('./tsconfig.app.json'),
       }
     },
     react: {

@@ -12,7 +12,7 @@ const c={
     },
   },
 }
-export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
+export default defineConfig(({ command }) => {
   if (command === 'serve') {
     c.base=''
     return c

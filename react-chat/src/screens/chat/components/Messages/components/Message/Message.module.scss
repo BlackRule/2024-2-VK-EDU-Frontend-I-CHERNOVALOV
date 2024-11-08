@@ -1,0 +1,49 @@
+.message {
+    border-radius: 10px;
+    margin: 4px;
+    padding: 4px;
+    background-color: white;
+    align-self: flex-start;
+    max-width: 50%;
+}
+
+@keyframes appear {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.message.new {
+    animation-name: appear;
+    transform-origin: left bottom;
+    animation-duration: 0.3s;
+    animation-timing-function: linear;
+}
+
+@media (max-width: 640px) {
+    .message {
+        max-width: calc(100% - 30px);
+    }
+}
+
+.message.my {
+    align-self: flex-end;
+}
+
+.message.my.new {
+    transform-origin: right bottom;
+}
+
+.message .top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.message .text {
+    white-space: preserve-breaks;
+    word-break: break-word;
+}

@@ -1,3 +1,15 @@
+.title {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 26px;
+
+}
+
+.chats {
+    overflow-y: scroll;
+    flex-grow: 1;
+}
+
 .compose{
     position: absolute;
     bottom: 10px;

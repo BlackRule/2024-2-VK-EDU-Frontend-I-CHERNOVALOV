@@ -1,7 +1,7 @@
 import './App.css'
 import {useState} from 'react'
-import Chat from 'screens/chat/chat'
-import Chats from 'screens/chats/chats'
+import Chat from 'screens/chat/Chat.tsx'
+import Chats from 'screens/chats/Chats.tsx'
 import {SwitchScreenTo} from './types.ts'
 
 

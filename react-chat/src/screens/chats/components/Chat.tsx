@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import {Message, SwitchScreenTo} from '@/types.ts'
+import {Message, SwitchScreenTo} from '~/types.ts'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import styles from './Chat.module.scss'
 

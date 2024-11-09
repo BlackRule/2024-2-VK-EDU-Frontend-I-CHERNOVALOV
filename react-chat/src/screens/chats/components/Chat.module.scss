@@ -1,3 +1,4 @@
+@use 'components/common';
 .chat{
     display: flex;
     gap: 10px;
@@ -8,6 +9,18 @@
     & *{
         cursor: pointer;
     }
+    padding: {
+        top: 10px;
+        bottom: 10px;
+    }
+  @include common.mobile-breakpoint {
+    & {
+      padding: {
+        top: 0;
+        bottom: 0;
+    }
+    }
+  }
 }
 .chat:hover{
     background-color: #ddd;

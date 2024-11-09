@@ -13,7 +13,7 @@ html {
 
 body {
     margin: 0;
-    background-color: #fff;
+    background-color: #eeeeee;
     color: #333;
     font-size: 15px;
     font-family: Helvetica, Arial, sans-serif;
@@ -21,7 +21,6 @@ body {
     line-height: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     height: 100%;
 }
 
@@ -39,4 +38,10 @@ div{
 a {
     color: inherit;
     text-decoration: none;
+}
+
+button{
+    border: none;
+    background-color: transparent;
+    color: inherit;
 }

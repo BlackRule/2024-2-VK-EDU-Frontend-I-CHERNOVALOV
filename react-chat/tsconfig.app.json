@@ -14,7 +14,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
-      "@/*": ["src/*"],
+      "~/*": ["src/*"],
       "components/*": ["src/components/*"],
       "screens/*": ["src/screens/*"]
     },

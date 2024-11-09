@@ -6,10 +6,11 @@ import {
   useRef,
   useState
 } from 'react'
-import {SwitchScreenTo} from '@/types.ts'
+import {SwitchScreenTo} from '~/types.ts'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
 import Screen from 'screens/Screen.jsx'
+import ScreenBottom from 'screens/ScreenBottom/ScreenBottom.tsx'
 import Messages from 'screens/chat/components/Messages/Messages.tsx'
 import {MessagesWithNeedsScroll, MessageWithIsNew} from 'screens/chat/types.tsx'
 import styles from './Chat.module.scss'
@@ -209,9 +210,9 @@ function Chat({switchScreenTo}: { switchScreenTo: SwitchScreenTo }) {
   return (
     <Screen>
       <Topbar>
-        <MaterialSymbol onClick={(e) => {
+        <button onClick={(e) => {
           switchScreenTo('chats')
-        }} symbol='arrow_back'/>
+        }}><MaterialSymbol symbol='arrow_back'/></button>
         <div className={styles.horizontal}>
           <MaterialSymbol symbol='person' hoverable={false}/>
           <div className={styles.vertical}>
@@ -222,13 +223,15 @@ function Chat({switchScreenTo}: { switchScreenTo: SwitchScreenTo }) {
         <div><MaterialSymbol symbol='search' />
           <MaterialSymbol symbol='more_vert' /></div>
       </Topbar>
-      <Messages data={data}/>
-      <div className={styles.form}>
-        <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
-          onKeyPress={textareaOnKeypress} ref={textareaRef}></textarea>
-        <MaterialSymbol symbol='attachment' />
-        <MaterialSymbol symbol='send' onClick={sendMessage}/>
-      </div>
+      <ScreenBottom>
+        <Messages data={data}/>
+        <div className={styles.form}>
+          <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
+            onKeyPress={textareaOnKeypress} ref={textareaRef}></textarea>
+          <MaterialSymbol symbol='attachment'/>
+          <button onClick={sendMessage}><MaterialSymbol symbol='send'/></button>
+        </div>
+      </ScreenBottom>
     </Screen>
   )
 }

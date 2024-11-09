@@ -4,6 +4,10 @@
     padding-left: 5px;
     transition-timing-function: linear;
     transition-duration: 0.3s;
+    cursor: pointer;
+    & *{
+        cursor: pointer;
+    }
 }
 .chat:hover{
     background-color: #ddd;
@@ -48,4 +52,8 @@
 }
 .chat .badge.mention::before{
     content:'@ '
+}
+
+.photo_camera{
+  color: #50b052;
 }

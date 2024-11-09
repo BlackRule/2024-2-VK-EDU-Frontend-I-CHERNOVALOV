@@ -35,9 +35,8 @@ function Chat({name, time, state, image, count, switchScreenTo, id, ...props}: C
     text = <><MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/> {props.image_attachment_alt}</>
   else text = props.text
   return <>
-    <a className={styles.chat} onClick={(e) => {
+    <div className={styles.chat} onClick={(e) => {
       switchScreenTo('chat')
-      e.preventDefault()
     }}>
       <img src={image} alt="avatar"/>
       <div className={styles.body}>
@@ -50,7 +49,7 @@ function Chat({name, time, state, image, count, switchScreenTo, id, ...props}: C
           {badge}
         </div>
       </div>
-    </a>
+    </div>
   </>
 }
 

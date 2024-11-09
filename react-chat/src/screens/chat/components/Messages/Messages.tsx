@@ -1,5 +1,5 @@
 import {RefObject, useEffect, useRef} from 'react'
-import {ArrayOfMessagePropsWithNeedsScroll} from 'screens/chat/types.tsx'
+import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import Message from './components/Message/Message.tsx'
 import styles from './Messages.module.scss'
 
@@ -35,7 +35,7 @@ function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>)
 
 }
 
-const Messages = ({data}: { data: ArrayOfMessagePropsWithNeedsScroll }) => {
+const Messages = ({data}: { data: MessagesWithNeedsScroll }) => {
   const messagesScrollableRef = useRef<HTMLDivElement>(null)
   useKeepScrollPositionOnResize(messagesScrollableRef)
 

@@ -115,7 +115,6 @@ function Chat({getData, setData}:{getData:(chatId:number)=>MessageWithIsNew[],
     setData(Number(URLparams.chatId),(prevData) => {
       const t = [...prevData, {
         id: Date.now(),
-        isNew: true,
         name: 'Иван',
         text: text,
         time: `${hours}:${minutes}`

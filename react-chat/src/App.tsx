@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {createHashRouter, RouterProvider} from 'react-router-dom'
 import Chat from 'screens/chat/Chat.tsx'
-import {MessagesWithNeedsScroll, MessageWithIsNew} from 'screens/chat/types.tsx'
+import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import Chats from 'screens/chats/Chats.tsx'
 import './App.css'
 
@@ -12,16 +12,15 @@ export const paths={
 }
 
 
-function useLocalStorage<T,TasSaved>(defaultDataAsSavedUsedToGetTypeOnly:TasSaved,default_data:T,T_to_TAS:(data:T)=>void){
+function useLocalStorage<T>(default_data:T){
   const [data, setData] = useState(default_data)
-  const dataToSaveRef = useRef<TasSaved>([] as TasSaved)
+  const dataToSaveRef = useRef<T>([] as T)
 
   const unloadHandler = useCallback(() => {
-    T_to_TAS(dataToSaveRef.current as unknown as T)
     localStorage.setItem('messages', JSON.stringify(dataToSaveRef.current))
-  },[T_to_TAS,dataToSaveRef])
+  },[dataToSaveRef])
   useEffect(() => {
-    dataToSaveRef.current = data as unknown as TasSaved
+    dataToSaveRef.current = data
   }, [data])
   useEffect(() => {
     let item = localStorage.getItem('messages')
@@ -36,27 +35,18 @@ function useLocalStorage<T,TasSaved>(defaultDataAsSavedUsedToGetTypeOnly:TasSave
     // because const [data, setData] = useState(default_data)
     // and return () => { unloadHandler() }
     // so below is needed
-    dataToSaveRef.current = data as unknown as TasSaved
+    dataToSaveRef.current = data
     window.addEventListener('unload', unloadHandler)
     return () => {
       window.removeEventListener('unload', unloadHandler)
       unloadHandler()
     }
-  }, [T_to_TAS, default_data, unloadHandler])
+  }, [default_data, unloadHandler])
 
   return [data, setData] as const
 }
 
 function App() {
-
-  const T_to_TAS = useRef((ds:MessagesWithNeedsScroll[])=>{
-    for (const d of ds) {
-      for (const message of d) {
-        delete message.isNew
-      }
-    }
-  }).current
-  const defaultDataAsSavedUsedToGetTypeOnly=useRef([] as MessageWithIsNew[][]).current
   const defaultData = useRef([[
     {
       id: 1,
@@ -146,7 +136,7 @@ function App() {
     }
   ]
   ] as MessagesWithNeedsScroll[]).current
-  const [data, setData] = useLocalStorage(defaultDataAsSavedUsedToGetTypeOnly,defaultData,T_to_TAS)
+  const [data, setData] = useLocalStorage(defaultData)
   const routes = [
     {
       element: <Chats/>,

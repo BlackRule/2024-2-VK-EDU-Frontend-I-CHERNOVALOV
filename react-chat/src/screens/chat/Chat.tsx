@@ -144,13 +144,13 @@ function Chat({getData, setData}:{getData:(chatId:number)=>MessageWithIsNew[],
     <Screen>
       <Topbar>
         <Link to={paths.chats}><MaterialSymbol symbol='arrow_back'/></Link>
-        <div className={styles.horizontal}>
+        <Link className={styles.horizontal} to={paths.profile}>
           <MaterialSymbol symbol='person' hoverable={false}/>
           <div className={styles.vertical}>
             <div className={styles.name}>Дженнифер</div>
             <div className={styles.lastSeen}>была 2 часа назад</div>
           </div>
-        </div>
+        </Link>
         <div><MaterialSymbol symbol='search' />
           <MaterialSymbol symbol='more_vert' /></div>
       </Topbar>

@@ -1,0 +1,54 @@
+.screenBottom{
+  padding: 20px;
+}
+.photo {
+  align-self: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+  padding: 10px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  overflow: hidden;
+  & > label {
+    font-size: 0.8em;
+    padding: 5px;
+    color: #888;
+  }
+  & > label,& input,& > span, &>textarea {
+    background-color: #eee;
+    padding-left: 10px;
+  }
+  &>span>input {
+    padding-left: 0;
+  }
+  & input, &>textarea,&>span{
+    border: 0;
+    border-bottom: 1px solid black;
+    padding-bottom: 7px;
+  }
+  &>textarea {
+    resize: none;
+  }
+
+  &>span>input{
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.hint {
+  font-size: 0.8em;
+  padding-left: 10px;
+}
+

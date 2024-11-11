@@ -4,11 +4,13 @@ import Chat from 'screens/chat/Chat.tsx'
 import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import Chats from 'screens/chats/Chats.tsx'
 import './App.css'
+import Profile from "screens/profile/Profile.tsx";
 
 
 export const paths={
   chat : (chatId:number)=>`/chat/${chatId}`,
-  chats : '/'
+  chats : '/',
+  profile : '/profile'
 }
 
 
@@ -151,6 +153,10 @@ function App() {
         }
       }/>,
       path: 'chat/:chatId',
+    },
+    {
+      element: <Profile/>,
+      path: paths.profile,
     },
   ]
   const router = createHashRouter(routes,{

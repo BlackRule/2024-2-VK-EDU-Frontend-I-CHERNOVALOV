@@ -22,18 +22,18 @@ const Profile = () => {
         <MaterialSymbol symbol={'photo_camera'}/>
       </div>
       <div className={styles.field}>
-        <label htmlFor="">Full name</label>
-        <input type="text" value={'Tony Jackobson'}/>
+        <label htmlFor={`${styles.field}1`}>Full name</label>
+        <input type="text" value={'Tony Jackobson'} id={`${styles.field}1`}/>
         <div className={styles.hint}></div>
       </div>
       <div className={styles.field}>
-        <label htmlFor="">Username</label>
-        <span>@<input type="text" value={'tony'}/></span>
+        <label htmlFor={`${styles.field}2`}>Username</label>
+        <span>@<input type="text" value={'tony'} id={`${styles.field}2`}/></span>
         <div className={styles.hint}>Minimum length is 5 characters</div>
       </div>
       <div className={styles.field}>
-        <label htmlFor="">Bio</label>
-        <textarea value={'Subtitle 1'} rows={4} />
+        <label htmlFor={`${styles.field}3`}>Bio</label>
+        <textarea value={'Subtitle 1'} rows={4} id={`${styles.field}3`} />
         <div className={styles.hint}>Any details about you</div>
       </div>
     </ScreenBottom>

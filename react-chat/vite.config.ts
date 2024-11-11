@@ -4,20 +4,20 @@ import {defineConfig} from 'vite'
 // https://vite.dev/config/
 const c = {
   base: '/2024-2-VK-EDU-Frontend-I-Chernovalov',
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '~': '/src',
-      'components': '/src/components',
-      'screens': '/src/screens',
-    },
-  },
   css: {
     preprocessorOptions: {
       scss: {
         api: 'modern'
       }
     }
+  },
+  plugins: [react()],
+  resolve: {
+    alias: {
+      'components': '/src/components',
+      'screens': '/src/screens',
+      '~': '/src',
+    },
   }
 }
 export default defineConfig(({command}) => {

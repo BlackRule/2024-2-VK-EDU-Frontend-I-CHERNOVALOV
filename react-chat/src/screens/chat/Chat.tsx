@@ -1,18 +1,17 @@
 import {
   KeyboardEventHandler,
   RefObject,
-  useCallback,
   useEffect,
-  useRef,
-  useState
+  useRef
 } from 'react'
-import {SwitchScreenTo} from '~/types.ts'
+import {Link, useParams} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
 import Screen from 'screens/Screen.jsx'
 import ScreenBottom from 'screens/ScreenBottom/ScreenBottom.tsx'
 import Messages from 'screens/chat/components/Messages/Messages.tsx'
 import {MessagesWithNeedsScroll, MessageWithIsNew} from 'screens/chat/types.tsx'
+import {paths} from '~/App.tsx'
 import styles from './Chat.module.scss'
 
 function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
@@ -96,78 +95,13 @@ function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
   }, [textareaRef])
 }
 
-function useLocalStorage<T,TasSaved>(defaultDataAsSavedUsedToGetTypeOnly:TasSaved,default_data:T,T_to_TAS:(data:T)=>void){
-  const [data, setData] = useState(default_data)
-  const dataToSaveRef = useRef<TasSaved>([] as TasSaved)
 
-  const unloadHandler = useCallback(() => {
-    T_to_TAS(dataToSaveRef.current as unknown as T)
-    localStorage.setItem('messages', JSON.stringify(dataToSaveRef.current))
-  },[T_to_TAS,dataToSaveRef])
-  useEffect(() => {
-    dataToSaveRef.current = data as unknown as TasSaved
-  }, [data])
-  useEffect(() => {
-    let item = localStorage.getItem('messages')
-    if (item === null) {
-      localStorage.setItem('messages', JSON.stringify(default_data))
-    }
-    item = localStorage.getItem('messages')
-    const data: T = JSON.parse(item!)
-    setData(data)
-    //during initial render
-    // useEffect(() => { dataToSaveRef.current = default_data }, [data]) is triggered
-    // because const [data, setData] = useState(default_data)
-    // and return () => { unloadHandler() }
-    // so below is needed
-    dataToSaveRef.current = data as unknown as TasSaved
-    window.addEventListener('beforeunload', unloadHandler)
-    return () => {
-      window.removeEventListener('beforeunload', unloadHandler)
-      unloadHandler()
-    }
-  }, [T_to_TAS, default_data, unloadHandler])
-  
-
-  
-  return [data, setData] as const
-}
-
-function Chat({switchScreenTo}: { switchScreenTo: SwitchScreenTo }) {
+function Chat({getData, setData}:{getData:(chatId:number)=>MessageWithIsNew[],
+  setData: (chatId:number,cb:(prevData:MessageWithIsNew[])=>MessageWithIsNew[])=>void
+}) {
+  const URLparams = useParams<{chatId: string}>()
+  const data = getData(Number(URLparams.chatId))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const T_to_TAS = useRef((d:MessagesWithNeedsScroll)=>{
-    for (const message of d) {
-      delete message.isNew
-    }
-  }).current
-  const defaultDataAsSavedUsedToGetTypeOnly=useRef([] as MessageWithIsNew[]).current
-  const defaultData = useRef([
-    {
-      id: 1,
-      name: 'Дженнифер',
-      text: 'Я тут кое-что нарисовала...\nПосмотри как будет время...',
-      time: '10:53'
-    },
-    {
-      id: 2,
-      name: 'Иван',
-      text: 'Горжусь тобой! Ты крутая!',
-      time: '10:53'
-    },
-    {
-      id: 3,
-      name: 'Дженнифер',
-      text: 'Тебе нравится как я нарисовала?',
-      time: '10:53'
-    },
-    {
-      id: 4,
-      name: 'Иван',
-      text: 'Джен, ты молодеееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееец!',
-      time: '10:53'
-    },
-  ] as MessagesWithNeedsScroll).current
-  const [data, setData] = useLocalStorage(defaultDataAsSavedUsedToGetTypeOnly,defaultData,T_to_TAS)
   useAutosize(textareaRef)
 
   function sendMessage() {
@@ -178,7 +112,7 @@ function Chat({switchScreenTo}: { switchScreenTo: SwitchScreenTo }) {
     const hours = `${date.getHours()}`.padStart(2, '0')
     const minutes = `${date.getMinutes()}`.padStart(2, '0')
     const text = textarea.value
-    setData((prevData) => {
+    setData(Number(URLparams.chatId),(prevData) => {
       const t = [...prevData, {
         id: Date.now(),
         isNew: true,
@@ -210,9 +144,7 @@ function Chat({switchScreenTo}: { switchScreenTo: SwitchScreenTo }) {
   return (
     <Screen>
       <Topbar>
-        <button onClick={(e) => {
-          switchScreenTo('chats')
-        }}><MaterialSymbol symbol='arrow_back'/></button>
+        <Link to={paths.chats}><MaterialSymbol symbol='arrow_back'/></Link>
         <div className={styles.horizontal}>
           <MaterialSymbol symbol='person' hoverable={false}/>
           <div className={styles.vertical}>

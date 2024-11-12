@@ -8,7 +8,7 @@ import styles from './Messages.module.scss'
 function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>) {
   const scrollPercentRef = useRef<number | null>(null)
   useEffect(() => {
-    const scrollListener = () =>{
+    const scrollListener = () => {
       console.log('scroll')
       if (scrollableRef.current === null) return
       const scrollable = scrollableRef.current
@@ -18,7 +18,7 @@ function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>)
     const scrollable = scrollableRef.current
     scrollable.scrollTop = scrollable.scrollHeight
     scrollable.addEventListener('scroll', scrollListener)
-    const resizeObserver=new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       console.log('resize')
       if (scrollPercentRef.current === null) return
       const percent = scrollPercentRef.current
@@ -50,8 +50,12 @@ const Messages = ({data}: { data: MessagesWithNeedsScroll }) => {
 
   return <div className={styles['messages-scroll']} ref={messagesScrollableRef}>
     <div className={styles.messages}>
-      {data.map((message) =>
-        <Message key={message.id} {...message}/>)}
+      {data.map((message) => {
+        message = {...message}
+        return <Message key={message.id} {...message}
+          isNew={data.length !== 0 && data.needsScroll && message.id === data[data.length - 1].id}
+        />
+      })}
     </div>
   </div>
 }

@@ -1,6 +1,8 @@
 import cn from 'classnames'
-import {Message, SwitchScreenTo} from '@/types.ts'
+import {Link} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
+import {paths} from '~/App.tsx'
+import {Message} from '~/types.ts'
 import styles from './Chat.module.scss'
 
 
@@ -8,14 +10,13 @@ type ChatProps = Omit<Message,'text'>&{
     count?: number,
     image: string,
     state: string,
-    switchScreenTo: SwitchScreenTo,
 } & (
     { text: string }
     |
     { image_attachment_alt: string }
     )
 
-function Chat({name, time, state, image, count, switchScreenTo, id, ...props}: ChatProps) {
+function Chat({name, time, state, image, count, id, ...props}: ChatProps) {
   let badge = null
   switch (state) {
   case 'new':
@@ -35,9 +36,7 @@ function Chat({name, time, state, image, count, switchScreenTo, id, ...props}: C
     text = <><MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/> {props.image_attachment_alt}</>
   else text = props.text
   return <>
-    <div className={styles.chat} onClick={(e) => {
-      switchScreenTo('chat')
-    }}>
+    <Link className={styles.chat} to={paths.chat(id)}>
       <img src={image} alt="avatar"/>
       <div className={styles.body}>
         <div className={styles.top}>
@@ -49,7 +48,7 @@ function Chat({name, time, state, image, count, switchScreenTo, id, ...props}: C
           {badge}
         </div>
       </div>
-    </div>
+    </Link>
   </>
 }
 

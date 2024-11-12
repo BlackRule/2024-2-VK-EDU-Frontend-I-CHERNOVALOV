@@ -1,0 +1,15 @@
+@use 'components/common';
+.ScreenBottom {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-top: 10px;
+  background-color: white;
+  flex-grow: 1;
+  @include common.mobile-breakpoint {
+    & {
+      margin-top: 0;
+    }
+  }
+  @include common.border-radius
+}

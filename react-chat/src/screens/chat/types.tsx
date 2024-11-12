@@ -1,4 +1,4 @@
-import {Message} from '@/types.ts'
+import {Message} from '~/types.ts'
 
 export type MessageWithIsNew = Message & { isNew?: boolean };
-export type MessagesWithNeedsScroll = MessageWithIsNew[] & { needsScroll?: boolean };
+export type MessagesWithNeedsScroll = Message[] & { needsScroll?: boolean };

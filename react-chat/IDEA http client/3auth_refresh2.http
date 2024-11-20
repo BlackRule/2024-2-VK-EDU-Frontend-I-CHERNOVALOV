@@ -1,0 +1,18 @@
+# curl -X 'POST'
+#  'http://vkedu-fullstack-div2.ru/api/auth/refresh/'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/json'
+#  -H 'X-CSRFToken: UN2L4mCEkDoGRuvKwnyYWnGy5yotVBY42mfHGxlGEsrQ5telSeJ4LE4sfJpaIDUq'
+#  -d '{
+#  "refresh": "string"
+#}'
+POST http://vkedu-fullstack-div2.ru/api/auth/refresh/
+accept: application/json
+Content-Type: application/json
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMTQxODAzNCwiaWF0IjoxNzMxNDEwODM0LCJqdGkiOiIzZjc1ZWY4MzZjYjE0ODAxOGZhYzJiMzM3ZmE1ZTg2ZCIsInVzZXJfaWQiOiJkNGIxMmVhNS0yMmZkLTQ3OTEtYTRlMC02ODZhODU0MjY2ZDUifQ.g-K4KiF0kV1x5vS5xt1ASfoP0TgAUSJMt9U3jPBTg24"
+}
+
+###
+

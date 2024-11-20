@@ -1,162 +1,121 @@
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {Centrifuge} from 'centrifuge'
+import {useEffect, useRef, useState} from 'react'
 import {createHashRouter, RouterProvider} from 'react-router-dom'
 import Chat from 'screens/chat/Chat.tsx'
-import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
+
 import Chats from 'screens/chats/Chats.tsx'
 import './App.css'
-import Profile from "screens/profile/Profile.tsx";
-
+import NewChat from 'screens/newChat/NewChat.tsx'
+import Profile from 'screens/profile/Profile.tsx'
+import SignIn from 'screens/signIn/SgnIn.tsx'
+import SignUp from 'screens/signUp/SignUp.tsx'
+import {
+  AddCallbackForCentrifuge,
+  api,
+  CallbackForCentrifuge,
+  RemoveCallbackForCentrifuge,
+  USER_ID_LS_KEY
+} from '~/common.ts'
 
 export const paths={
-  chat : (chatId:number)=>`/chat/${chatId}`,
+  chat : (chatId:string)=>`/chat/${chatId}`,
   chats : '/',
-  profile : '/profile'
+  newChat: '/newChat',
+  newGroupChat: '/newGroupChat',
+  profile : '/profile',
+  signIn : '/SignIn',
+  signUp: '/signUp',
 }
 
+function useCentrifuge(userId:string|null,callbacksForCentrifuge:CallbackForCentrifuge[]){
 
-function useLocalStorage<T>(default_data:T){
-  const [data, setData] = useState(default_data)
-  const dataToSaveRef = useRef<T>([] as T)
-
-  const unloadHandler = useCallback(() => {
-    localStorage.setItem('messages', JSON.stringify(dataToSaveRef.current))
-  },[dataToSaveRef])
+  const useCentrifugeLogger = {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+    log:(...args)=>true&&console.log(...args),
+  }
+  // отслеживайте, что центрифуга монтируется единожды
   useEffect(() => {
-    dataToSaveRef.current = data
-  }, [data])
-  useEffect(() => {
-    let item = localStorage.getItem('messages')
-    if (item === null || !Array.isArray(JSON.parse(item)[0])) {
-      localStorage.setItem('messages', JSON.stringify(default_data))
+    if (userId === null) {
+      useCentrifugeLogger.log('no userId to connect Centrifuge')
+      return
     }
-    item = localStorage.getItem('messages')!
-    const data: T = JSON.parse(item)
-    setData(data)
-    //during initial render
-    // useEffect(() => { dataToSaveRef.current = default_data }, [data]) is triggered
-    // because const [data, setData] = useState(default_data)
-    // and return () => { unloadHandler() }
-    // so below is needed
-    dataToSaveRef.current = data
-    window.addEventListener('unload', unloadHandler)
+    useCentrifugeLogger.log('centrifuge start')
+
+    const centrifuge = new Centrifuge('wss://vkedu-fullstack-div2.ru/connection/websocket/', {
+      debug: true,
+      getToken: (ctx) =>
+        new Promise((resolve, reject) =>
+          api('centrifugo/connect/POST', ctx)
+            .then((data) => resolve(data.token))
+            .catch((err) => reject(err))
+        )
+    })
+    const subscription = centrifuge.newSubscription(userId, {
+      getToken: (ctx) =>
+        new Promise((resolve, reject) =>
+          api('centrifugo/subscribe/POST', ctx)
+            .then((data) => resolve(data.token))
+            .catch((err) => reject(err))
+        )
+    })
+    subscription.on('publication', function (ctx) {
+      useCentrifugeLogger.log(ctx.data)
+      callbacksForCentrifuge.forEach(cb=>cb(ctx.data))
+
+    })
+    subscription.subscribe()
+    centrifuge.connect()
+    useCentrifugeLogger.log('centrifuge end')
+
     return () => {
-      window.removeEventListener('unload', unloadHandler)
-      unloadHandler()
+      // useCentrifugeLogger.log('uncentrifuge start')
+      subscription.removeAllListeners()
+      subscription.unsubscribe()
+      centrifuge.disconnect()
+      useCentrifugeLogger.log('uncentrifuge end')
     }
-  }, [default_data, unloadHandler])
-
-  return [data, setData] as const
+  }, [userId])
 }
 
 function App() {
-  const defaultData = useRef([[
-    {
-      id: 1,
-      name: 'Дженнифер',
-      text: 'Я тут кое-что нарисовала...\nПосмотри как будет время...',
-      time: '10:53'
-    },
-    {
-      id: 2,
-      name: 'Иван',
-      text: 'Горжусь тобой! Ты крутая!',
-      time: '10:53'
-    },
-    {
-      id: 3,
-      name: 'Дженнифер',
-      text: 'Тебе нравится как я нарисовала?',
-      time: '10:53'
-    },
-    {
-      id: 4,
-      name: 'Иван',
-      text: 'Джен, ты молодеееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееец!',
-      time: '10:53'
-    },
-  ],
-  [
-    {
-      id: 5,
-      name: 'Александр',
-      text: 'Привет! Как дела?',
-      time: '11:00'
-    },
-    {
-      id: 6,
-      name: 'Мария',
-      text: 'Все хорошо, спасибо! А ты как?',
-      time: '11:01'
-    },
-    {
-      id: 7,
-      name: 'Александр',
-      text: 'Тоже отлично! Чем занимаешься?',
-      time: '11:02'
-    },
-    {
-      id: 8,
-      name: 'Мария',
-      text: 'Читаю интересную книгу по программированию. Как у тебя на работе?',
-      time: '11:03'
-    },
-    {
-      id: 9,
-      name: 'Александр',
-      text: 'Завален делами, но еще немного и будет свободное время!',
-      time: '11:04'
-    },
-    {
-      id: 10,
-      name: 'Мария',
-      text: 'Ну, удачи тебе! Не забывай отдыхать.',
-      time: '11:05'
-    },
-    {
-      id: 11,
-      name: 'Дмитрий',
-      text: 'Кто хочет в кино сегодня вечером?',
-      time: '11:06'
-    },
-    {
-      id: 12,
-      name: 'Екатерина',
-      text: 'Я бы пошла! Какой фильм будем смотреть?',
-      time: '11:07'
-    },
-    {
-      id: 13,
-      name: 'Дмитрий',
-      text: 'Предлагаю посмотреть новый фильм по Marvel.',
-      time: '11:08'
-    },
-    {
-      id: 14,
-      name: 'Екатерина',
-      text: 'Отличный выбор! Значит договорились.',
-      time: '11:09'
-    }
-  ]
-  ] as MessagesWithNeedsScroll[]).current
-  const [data, setData] = useLocalStorage(defaultData)
+  // const defaultData:MessagesWithNeedsScroll[]
+  // const [data, setData] = useLocalStorage(defaultData)
+  const [userId, setUserId] = useState<null|string>(localStorage.getItem(USER_ID_LS_KEY))
+  const callbacksForCentrifuge = useRef<CallbackForCentrifuge[]>([]).current
+  const addCallbackForCentrifuge:AddCallbackForCentrifuge = useRef(
+    (callback:CallbackForCentrifuge)=>
+      callbacksForCentrifuge.push(callback)
+  ).current
+  const removeCallbackForCentrifuge:RemoveCallbackForCentrifuge = useRef(
+    (callbackId: number)=>
+      callbacksForCentrifuge.splice(callbackId, 1)
+  ).current
+  useCentrifuge(userId,callbacksForCentrifuge)
   const routes = [
     {
       element: <Chats/>,
       path: paths.chats,
     },
     {
-      element: <Chat getData={(chatId)=>data[chatId]} setData={
-        (chatId,cb)=>{
-          const newData = [...data]
-          newData[chatId]=cb(newData[chatId])
-          setData(newData)
-        }
-      }/>,
+      element: <Chat {...{addCallbackForCentrifuge,removeCallbackForCentrifuge}}/>,
       path: 'chat/:chatId',
     },
     {
       element: <Profile/>,
       path: paths.profile,
+    },
+    {
+      element: <SignIn setUserId={setUserId}/>,
+      path: paths.signIn
+    },
+    {
+      element: <NewChat/>,
+      path: paths.newChat
+    },
+    {
+      element: <SignUp/>,
+      path: paths.signUp
     },
   ]
   const router = createHashRouter(routes,{

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "centrifuge": "^5.2.2",
     "classnames": "^2.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

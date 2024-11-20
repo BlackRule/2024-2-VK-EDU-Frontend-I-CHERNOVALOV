@@ -2,11 +2,12 @@ import {Link} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
 import Screen from 'screens/Screen.tsx'
-import ScreenBottom from 'screens/ScreenBottom/ScreenBottom.tsx'
+import ScreenBottom from 'screens/components/ScreenBottom/ScreenBottom.tsx'
 import {paths} from '~/App.tsx'
 import styles from './Profile.module.scss'
 
 const Profile = () => {
+  const backgroundImage = 'chat_images/5.png'
   return <Screen>
     <Topbar>
       <Link to={paths.chats}><MaterialSymbol symbol='arrow_back'/></Link>
@@ -17,7 +18,7 @@ const Profile = () => {
     </Topbar>
     <ScreenBottom className={styles.screenBottom}>
       <div className={styles.photo} style={{
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4),rgba(0, 0, 0, 0.4)),url(chat_images/5.png)'
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4),rgba(0, 0, 0, 0.4)),url(${ backgroundImage})`
       }}>
         <MaterialSymbol symbol={'photo_camera'}/>
       </div>

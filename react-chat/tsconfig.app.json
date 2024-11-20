@@ -14,9 +14,9 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
-      "~/*": ["src/*"],
       "components/*": ["src/components/*"],
-      "screens/*": ["src/screens/*"]
+      "screens/*": ["src/screens/*"],
+      "~/*": ["src/*"]
     },
     "skipLibCheck": true,
     "strict": true,

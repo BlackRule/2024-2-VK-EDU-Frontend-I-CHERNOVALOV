@@ -2,21 +2,16 @@ import cn from 'classnames'
 import {Link} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import {paths} from '~/App.tsx'
-import {Message} from '~/types.ts'
+import {Message} from '~/common.ts'
 import styles from './Chat.module.scss'
 
 
-type ChatProps = Omit<Message,'text'>&{
-    count?: number,
-    image: string,
-    state: string,
-} & (
-    { text: string }
-    |
-    { image_attachment_alt: string }
-    )
+export type ChatProps = Omit<Message, 'text'>
+  & { image?: string, }
+  & ({ count?: never, state: 'unread' | 'read', } | { count: number, state: 'new' | 'mention', })
+  & ({ image_attachment_alt?:never,text: Message['text'] } | { image_attachment_alt: string,text?:never })
 
-function Chat({name, time, state, image, count, id, ...props}: ChatProps) {
+function Chat({name, time, state, image, count, id, image_attachment_alt,text}: ChatProps) {
   let badge = null
   switch (state) {
   case 'new':
@@ -29,12 +24,15 @@ function Chat({name, time, state, image, count, id, ...props}: ChatProps) {
     badge = <MaterialSymbol symbol='check' className={cn(styles.badge, styles.read)}/>
     break
   case 'mention':
-    badge = <div className={cn(styles.badge,styles.mention)}>{count}</div>
+    badge = <div className={cn(styles.badge, styles.mention)}>{count}</div>
   }
-  let text
-  if ('image_attachment_alt' in props)
-    text = <><MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/> {props.image_attachment_alt}</>
-  else text = props.text
+  let text_
+  if (image_attachment_alt)
+    text_ = <>
+      <MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/>
+      {image_attachment_alt}
+    </>
+  if (text) text_ = text
   return <>
     <Link className={styles.chat} to={paths.chat(id)}>
       <img src={image} alt="avatar"/>
@@ -44,7 +42,7 @@ function Chat({name, time, state, image, count, id, ...props}: ChatProps) {
           <div className={styles.time}>{time}</div>
         </div>
         <div className={styles.bottom}>
-          <div className={styles.text}>{text}</div>
+          <div className={styles.text}>{text_}</div>
           {badge}
         </div>
       </div>

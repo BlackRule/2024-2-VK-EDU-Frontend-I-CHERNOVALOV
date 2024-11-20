@@ -1,17 +1,21 @@
-import {
-  KeyboardEventHandler,
-  RefObject,
-  useEffect,
-  useRef
-} from 'react'
-import {Link, useParams} from 'react-router-dom'
+import {KeyboardEventHandler, RefObject, useEffect, useRef, useState} from 'react'
+import {Link, useNavigate, useParams} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
 import Screen from 'screens/Screen.jsx'
-import ScreenBottom from 'screens/ScreenBottom/ScreenBottom.tsx'
 import Messages from 'screens/chat/components/Messages/Messages.tsx'
-import {MessagesWithNeedsScroll, MessageWithIsNew} from 'screens/chat/types.tsx'
+import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
+import ScreenBottom from 'screens/components/ScreenBottom/ScreenBottom.tsx'
 import {paths} from '~/App.tsx'
+import {
+  AddCallbackForCentrifuge,
+  api,
+  CallbackForCentrifuge,
+  f2,
+  f3,
+  Message,
+  RemoveCallbackForCentrifuge
+} from '~/common.ts'
 import styles from './Chat.module.scss'
 
 function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
@@ -95,40 +99,23 @@ function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
   }, [textareaRef])
 }
 
-
-function Chat({getData, setData}:{getData:(chatId:number)=>MessageWithIsNew[],
-  setData: (chatId:number,cb:(prevData:MessageWithIsNew[])=>MessageWithIsNew[])=>void
-}) {
-  const URLparams = useParams<{chatId: string}>()
-  const data = getData(Number(URLparams.chatId))
+function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCallbackForCentrifuge: AddCallbackForCentrifuge,removeCallbackForCentrifuge:RemoveCallbackForCentrifuge }) {
+  const navigate=useNavigate()
+  const _chatId = useParams<{chatId: string}>().chatId
+  if(!_chatId) {
+    navigate(paths.chats)
+    //todo Will execution get terminated here?
+  }
+  const chatId=_chatId as string
+  const [data, setData] = useState<Message[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   useAutosize(textareaRef)
 
-  function sendMessage() {
+  async function sendMessage() {
     if (textareaRef.current === null) return
     const textarea = textareaRef.current
     if (textarea.value.trim().length === 0) return
-    const date = new Date()
-    const hours = `${date.getHours()}`.padStart(2, '0')
-    const minutes = `${date.getMinutes()}`.padStart(2, '0')
-    const text = textarea.value
-    setData(Number(URLparams.chatId),(prevData) => {
-      const t = [...prevData, {
-        id: Date.now(),
-        name: 'Иван',
-        text: text,
-        time: `${hours}:${minutes}`
-      }] as  MessagesWithNeedsScroll
-      t.needsScroll=true
-      if (textareaRef.current === null) return t
-      const textarea = textareaRef.current
-      textarea.value = ''
-      textarea.dispatchEvent(new Event('input', {
-        bubbles: true
-      }))
-      return t
-    })
-
+    await api('messages/POST',{chat:chatId,text: textarea.value})
   }
 
   const textareaOnKeypress: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
@@ -139,6 +126,36 @@ function Chat({getData, setData}:{getData:(chatId:number)=>MessageWithIsNew[],
     e.preventDefault()
     sendMessage()
   }
+
+  const callbackForCentrifuge=useRef<CallbackForCentrifuge>((data)=>{
+    console.log(`chat:${data}`)
+    setData((prevData) => {
+      const t = [...prevData, f3(data.message,/*todo*/'Иван')] as  MessagesWithNeedsScroll
+      t.needsScroll=true
+      if (textareaRef.current === null) return t
+      const textarea = textareaRef.current
+      textarea.value = ''
+      textarea.dispatchEvent(new Event('input', {
+        bubbles: true
+      }))
+      return t
+    })
+  }).current
+
+  useEffect(() => {
+    const callbackId=addCallbackForCentrifuge(callbackForCentrifuge)
+    return ()=>{
+      removeCallbackForCentrifuge(callbackId)
+    }
+  }, [])
+
+  useEffect(() => {
+    (async()=>
+      setData(f2(
+        (await api('messages/GET',{chat:chatId})).results
+      ))
+    )()
+  }, [])
 
   return (
     <Screen>

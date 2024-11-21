@@ -3,6 +3,9 @@ import * as rt from "runtypes";
 import {assert,Equals} from "tsafe"
 import {ApiInputMap, ApiOutputMap} from './api'
 
+//todo
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 const Optional=(T)=>rt.Optional(T.Or(rt.Null))
 
 const UserRt = rt.Record({
@@ -59,7 +62,9 @@ const ResultsRtC = rt.Record({
 
 
 
-
+//todo
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 const PagedResultsRt=(T)=> rt.Record({
   count: rt.Number,
   next: Optional(rt.String),

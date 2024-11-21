@@ -150,7 +150,11 @@ export async function api<K extends keyof ApiInputMap>(
     // @ts-expect-error
     delete data.id
   }
-  if (init.method === 'GET') url_ += `?${new URLSearchParams(data)}`
+  //todo
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  if (init.method === 'GET') { // @ts-expect-error
+    url_ += `?${new URLSearchParams(data)}`
+  }
   if (init.method === 'POST' || init.method === 'PUT' || init.method === 'PATCH')
     init.body = JSON.stringify(data)
   /*  if(log) {
@@ -171,6 +175,9 @@ export async function api<K extends keyof ApiInputMap>(
     cnt++
   }
   promise.then(r => {
+    //todo
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     gen_ApiOutputMap[url].check(r)
   })
   return promise

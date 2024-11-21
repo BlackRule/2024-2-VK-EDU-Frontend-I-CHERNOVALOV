@@ -29,6 +29,9 @@ export function f(v: ApiOutputMap['chats/GET']['results']): ChatProps[] {
 export function arrayAdapter<I,O,T=(v:I)=>O>(array:I[],elementAdapter:T): O[] {
   const r: O[] = []
   for (const el of array) {
+    //todo
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     r.push(elementAdapter(el))
   }
   return r

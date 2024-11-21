@@ -7,14 +7,10 @@ import Messages from 'screens/chat/components/Messages/Messages.tsx'
 import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import ScreenBottom from 'screens/components/ScreenBottom/ScreenBottom.tsx'
 import {paths} from '~/App.tsx'
+import {AddCallbackForCentrifuge, api, CallbackForCentrifuge, RemoveCallbackForCentrifuge} from '~/api.ts'
 import {
-  AddCallbackForCentrifuge,
-  api,
-  CallbackForCentrifuge,
-  f2,
-  f3,
-  Message,
-  RemoveCallbackForCentrifuge
+  messageAdapter,
+  Message, arrayAdapter,
 } from '~/common.ts'
 import styles from './Chat.module.scss'
 
@@ -128,9 +124,8 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   }
 
   const callbackForCentrifuge=useRef<CallbackForCentrifuge>((data)=>{
-    console.log(`chat:${data}`)
     setData((prevData) => {
-      const t = [...prevData, f3(data.message,/*todo*/'Иван')] as  MessagesWithNeedsScroll
+      const t = [...prevData, messageAdapter(data.message)] as  MessagesWithNeedsScroll
       t.needsScroll=true
       if (textareaRef.current === null) return t
       const textarea = textareaRef.current
@@ -151,8 +146,8 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
 
   useEffect(() => {
     (async()=>
-      setData(f2(
-        (await api('messages/GET',{chat:chatId})).results
+      setData(arrayAdapter(
+        (await api('messages/GET',{chat:chatId})).results,messageAdapter
       ))
     )()
   }, [])

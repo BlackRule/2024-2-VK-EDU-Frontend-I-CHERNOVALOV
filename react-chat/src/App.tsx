@@ -14,8 +14,11 @@ import {
   api,
   CallbackForCentrifuge,
   RemoveCallbackForCentrifuge,
+} from '~/api.ts'
+import {
   USER_ID_LS_KEY
 } from '~/common.ts'
+
 
 export const paths={
   chat : (chatId:string)=>`/chat/${chatId}`,
@@ -27,33 +30,21 @@ export const paths={
   signUp: '/signUp',
 }
 
-/*
-* subscription.on()  calls function even after subscription.removeAllListeners() so we need to make sure the function
-* passed to subscription.on() returns without doing anything after subscription.removeAllListeners() is called
-* */
-{shouldBeCalled,cb}
+
 function useCentrifuge(userId:string|null){
   const callbacksForCentrifuge = useRef<CallbackForCentrifuge[]>([]).current
   const addCallbackForCentrifuge = useRef<AddCallbackForCentrifuge>(
-    (callback:CallbackForCentrifuge)=>
-      callbacksForCentrifuge.push(callback)
+    (callback:CallbackForCentrifuge)=> callbacksForCentrifuge.push(callback)-1
   ).current
   const removeCallbackForCentrifuge = useRef<RemoveCallbackForCentrifuge>(
-    (callbackId: number)=>
-      callbacksForCentrifuge.splice(callbackId, 1)
+    (callbackId: number)=> callbacksForCentrifuge.splice(callbackId, 1)
   ).current
-  const useCentrifugeLogger = {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-    log:(...args)=>false&&console.log(...args),
-  }
-   useRef(0).current
+
+   
   useEffect(() => {
     if (userId === null) {
-      useCentrifugeLogger.log('no userId to connect Centrifuge')
       return
     }
-    useCentrifugeLogger.log('centrifuge start')
 
     const centrifuge = new Centrifuge('wss://vkedu-fullstack-div2.ru/connection/websocket/', {
       // debug: true,
@@ -72,26 +63,20 @@ function useCentrifuge(userId:string|null){
             .catch((err) => reject(err))
         )
     })
-    const listenerId =getListenerId(function (ctx) {
-      useCentrifugeLogger.log(ctx.data)
+    subscription.on('publication', function (ctx) {
       callbacksForCentrifuge.forEach(cb=>cb(ctx.data))
 
     })
-    subscription.on('publication', )
     subscription.subscribe()
     centrifuge.connect()
-    useCentrifugeLogger.log('centrifuge end')
 
     return () => {
-      // useCentrifugeLogger.log('uncentrifuge start')
-      subscription.unsubscribe()
-      subscription.removeAllListeners()
-      centrifuge.removeSubscription(subscription)
       centrifuge.disconnect()
-      useCentrifugeLogger.log('uncentrifuge end')
+      subscription.removeAllListeners()
+      subscription.unsubscribe()
     }
   }, [userId])
-  return [addCallbackForCentrifuge,removeCallbackForCentrifuge]
+  return [addCallbackForCentrifuge,removeCallbackForCentrifuge] as const
 }
 
 function App() {

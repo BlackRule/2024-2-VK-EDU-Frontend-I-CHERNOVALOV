@@ -9,7 +9,6 @@ function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>)
   const scrollPercentRef = useRef<number | null>(null)
   useEffect(() => {
     const scrollListener = () => {
-      console.log('scroll')
       if (scrollableRef.current === null) return
       const scrollable = scrollableRef.current
       scrollPercentRef.current = scrollable.scrollTop / scrollable.scrollHeight
@@ -19,7 +18,6 @@ function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>)
     scrollable.scrollTop = scrollable.scrollHeight
     scrollable.addEventListener('scroll', scrollListener)
     const resizeObserver = new ResizeObserver(() => {
-      console.log('resize')
       if (scrollPercentRef.current === null) return
       const percent = scrollPercentRef.current
       if (scrollableRef.current === null) return

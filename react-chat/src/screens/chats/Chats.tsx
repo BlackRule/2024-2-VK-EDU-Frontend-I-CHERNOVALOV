@@ -5,9 +5,10 @@ import {Link, useNavigate} from 'react-router-dom'
 import ScreenBottom from 'screens/components/ScreenBottom/ScreenBottom.tsx'
 import Screen from 'screens/Screen.jsx'
 import {paths} from '~/App.tsx'
-import {api, f} from '~/common.ts'
+import {f} from '~/common.ts'
 import styles from './Chats.module.scss'
 import Chat, {ChatProps} from './components/Chat.tsx'
+import { api } from '~/api.ts'
 
 function Chats() {
   const [chats, setChats] = useState<ChatProps[]>([])

@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react'
 import Screen from 'screens/Screen.tsx'
-import {api, User} from '~/common.ts'
+import {api, User} from '~/api.ts'
 import styles from './NewGroupChat.module.scss'
 
 const NewGroupChat = () => {

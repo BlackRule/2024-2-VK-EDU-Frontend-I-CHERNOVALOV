@@ -1,7 +1,7 @@
 import {useEffect} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {paths} from '~/App.tsx'
-import { api } from '~/common'
+import { api } from '~/api'
 import styles from './SignUp.module.scss'
 
 const SignUp =  () => {

@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {paths} from '~/App.tsx'
-import {ACCESS_TOKEN_LS_KEY, api, REFRESH_TOKEN_LS_KEY, USER_ID_LS_KEY} from '~/common.ts'
+import { api } from '~/api'
+import {ACCESS_TOKEN_LS_KEY, REFRESH_TOKEN_LS_KEY, USER_ID_LS_KEY} from '~/common.ts'
 import styles from './SignIn.module.scss'
 
 const SignIn: React.FC<{ setUserId: React.Dispatch<React.SetStateAction<string | null>> }> =

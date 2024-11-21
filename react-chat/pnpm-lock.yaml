@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       centrifuge:
-        specifier: ^5.2.2
-        version: 5.2.2
+        specifier: ^5.0.0
+        version: 5.0.0
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -740,8 +740,8 @@ packages:
   caniuse-lite@1.0.30001669:
     resolution: {integrity: sha512-DlWzFDJqstqtIVx1zeSpIMLjunf5SmwOw0N2Ck/QSQdS8PLS4+9HrLaYei4w8BIAL7IB/UEDu889d8vhCTPA0w==}
 
-  centrifuge@5.2.2:
-    resolution: {integrity: sha512-d1PW3HxtmN7rMhtaDeLgZnSuXuTqoWhlZPC/pm0UwzTnBve1QlMgzY4DHQ21mpQYEeVGes46KKXj0cZP7/uZrw==}
+  centrifuge@5.0.0:
+    resolution: {integrity: sha512-SYBaMnkOFJfrxVfv1Kiqqzq3TJZsFn4L8EDbN8C9F+xEXTTHkllmjrUqVYcL8mOyfQhOS/y3FxITrhrHTyBJ6w==}
 
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -2622,7 +2622,7 @@ snapshots:
 
   caniuse-lite@1.0.30001669: {}
 
-  centrifuge@5.2.2:
+  centrifuge@5.0.0:
     dependencies:
       events: 3.3.0
       protobufjs: 7.4.0

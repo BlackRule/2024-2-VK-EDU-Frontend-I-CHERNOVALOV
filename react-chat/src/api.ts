@@ -45,7 +45,7 @@ type API_MessageCommon = {
   files: { item: string }[],
   id: string,
   text/*todo depends on voice?*/: string,
-  voice?: string
+  voice?: string/*todo NoVoiceMessage must contain text !*/
 } & CreatedUpdatedAt
 type API_MessageWithId = { id: string, } & API_MessageCommon
 export type API_Message =
@@ -114,7 +114,7 @@ export type ApiOutputMap = {
   'chats/GET': Paginated<Avatar<string> & CreatedUpdatedAt & ChatCommon &
     {
       creator: User,
-      last_message?: API_Message
+      last_message: API_Message
     } & { members: User[] }>,
   'chats/POST': ChatOutput,
   'messages/GET': Paginated<API_Message>,
@@ -127,12 +127,15 @@ export type ApiOutputMap = {
 
 export async function api<K extends keyof ApiInputMap>(
   url: K,
-  data: ApiInputMap[K], log = true
+  data: ApiInputMap[K], logSend = false,logReceive = false
 ): Promise<ApiOutputMap[K]> {
   /* global RequestInit */
   const init: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json'
+    headers: 'files' in data?
+      {}
+      :
+      {
+      'Content-Type': 'application/json',
     }
   }
   init.method = url.match(/GET|POST/)![0]
@@ -152,9 +155,21 @@ export async function api<K extends keyof ApiInputMap>(
   if (init.method === 'GET') { // @ts-expect-error
     url_ += `?${new URLSearchParams(data)}`
   }
-  if (init.method === 'POST' || init.method === 'PUT' || init.method === 'PATCH')
+  // Максимальный размер body реквеста - 10MB
+  if('files' in data){
+    init.body=new FormData()
+    for (const dataKey in data) {
+      if (dataKey === 'files') continue
+      init.body.append(dataKey, data[dataKey])
+    }
+    for (const file of data.files) {
+      init.body.append('files', file)
+    }
+
+  }
+  else if (init.method === 'POST' || init.method === 'PUT' || init.method === 'PATCH')
     init.body = JSON.stringify(data)
-    if(log) {
+  if(logSend) {
     console.groupCollapsed('%csent', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), url)
     console.trace(init)
     console.groupEnd()
@@ -163,7 +178,7 @@ export async function api<K extends keyof ApiInputMap>(
     .then(res => {
       return res.json()
     })
-  if (log) {
+  if (logReceive) {
     promise.then((cnt => (r => {
       console.groupCollapsed('%creceived', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), url)
       console.log(r)

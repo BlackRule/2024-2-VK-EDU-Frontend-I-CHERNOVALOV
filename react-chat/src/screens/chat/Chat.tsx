@@ -123,6 +123,7 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   }
 
   const callbackForCentrifuge=useRef<CallbackForCentrifuge>((data)=>{
+    console.log(data)
     setData((prevData) => {
       const t = [...prevData, messageAdapter(data.message)] as  MessagesWithNeedsScroll
       t.needsScroll=true
@@ -134,6 +135,40 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
       }))
       return t
     })
+  }).current
+
+  const locationOnClick=useRef<React.MouseEventHandler<HTMLSpanElement>>(()=>{
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const {latitude, longitude} = position.coords
+        api('messages/POST',{chat:chatId,text: `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`})
+      },
+      (error) => {
+        //todo
+        console.error('Error obtaining location', error)
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000,
+      }
+    )
+  }).current
+  const imageOnClick=useRef<React.MouseEventHandler<HTMLSpanElement>>(()=>{
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.multiple = true
+    input.onchange = (event) => {
+      const target = event.target as HTMLInputElement
+      if (target.files) {
+        api('messages/POST',{chat:chatId,files:target.files,text:'text'},true,true)
+        input.remove()
+      }
+    }
+    input.click()
+
+
   }).current
 
   useEffect(() => {
@@ -170,7 +205,9 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
         <div className={styles.form}>
           <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
             onKeyPress={textareaOnKeypress} ref={textareaRef}></textarea>
-          <MaterialSymbol symbol='attachment'/>
+          {/*<MaterialSymbol symbol='attachment'/>*/}
+          <MaterialSymbol symbol='image' onClick={imageOnClick}/>
+          <MaterialSymbol symbol='location_on' onClick={locationOnClick}/>
           <button onClick={sendMessage}><MaterialSymbol symbol='send'/></button>
         </div>
       </ScreenBottom>

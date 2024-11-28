@@ -4,7 +4,6 @@ import Message from './components/Message/Message.tsx'
 import styles from './Messages.module.scss'
 
 //fixme browser is triggering scroll before resize. That scroll needs to be ignored
-//  Оно ведь работало но мне к сожалению никто не поверит.  я сам себе не верю ведь не работает теперь
 function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>) {
   const scrollPercentRef = useRef<number | null>(null)
   useEffect(() => {

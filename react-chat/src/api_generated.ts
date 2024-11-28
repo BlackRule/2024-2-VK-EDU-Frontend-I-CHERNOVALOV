@@ -3,8 +3,6 @@ import * as rt from "runtypes";
 import {assert,Equals} from "tsafe"
 import {ApiInputMap, ApiOutputMap} from './api'
 
-//todo
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const Optional=(T)=>rt.Optional(T.Or(rt.Null))
 
@@ -63,7 +61,6 @@ const ResultsRtC = rt.Record({
 
 
 //todo
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const PagedResultsRt=(T)=> rt.Record({
   count: rt.Number,
@@ -115,7 +112,8 @@ type Gen_ApiOutputMap = {
 
 }
 
-//Typechecking... Question to mentor: how to not copy paste here?
+//Fixme Question to mentor: how to not copy paste here?
+//Fixme if got optional expected required?
 // got,expected E.g.:
 // assert<Equals<ApiOutputMap['user/GET'], Gen_ApiOutputMap['user/GET']>>()
 const tmp:Gen_ApiOutputMap['user/GET']={} as ApiOutputMap['user/GET']

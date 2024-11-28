@@ -1,9 +1,5 @@
 import { jsonToRuntypes } from 'json-to-runtypes'
 
-// const jsonIn = "{\"password\":\"user101password\",\"username\":\"user101\"}"
-//
-// const typescript = jsonToRuntypes(JSON.parse(jsonIn))
-
 const json = {
     "id": "f11cc822-8348-4460-929e-467f3a2af748",
     "text": "w",

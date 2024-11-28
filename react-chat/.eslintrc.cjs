@@ -40,6 +40,7 @@ module.exports = {
   plugins: ['@typescript-eslint', 'import', 'react', 'react-hooks','typescript-sort-keys','sort-keys-fix'],
   root: true,
   rules: {
+    '@typescript-eslint/ban-ts-comment':'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     'import/order': [
       'error',

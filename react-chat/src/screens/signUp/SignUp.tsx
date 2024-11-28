@@ -1,5 +1,6 @@
-import {useEffect} from 'react'
 import {useNavigate} from 'react-router-dom'
+import SignInUpCommon from 'screens/components/SignInUpCommon/SignInUpCommon.tsx'
+import Screen from 'screens/Screen.jsx'
 import {paths} from '~/App.tsx'
 import { api } from '~/api'
 import styles from './SignUp.module.scss'
@@ -16,14 +17,16 @@ const SignUp =  () => {
     await api('register/POST',{bio,first_name,last_name,password,username})
     navigate(paths.signIn)
   }
-  return <form onSubmit={onSubmit}>
-    <input type="text" placeholder="username" required/>
-    <input type="password" placeholder="password" required/>
-    <input type="text" placeholder="first name" required/>
-    <input type="text" placeholder="last name" required/>
-    <textarea placeholder='bio'></textarea>
-    <input type="submit"/>
-  </form>
+  return <SignInUpCommon>
+    <form onSubmit={onSubmit}>
+      <input type="text" placeholder="username" required/>
+      <input type="password" placeholder="password" required autoComplete="new-password"/>
+      <input type="text" placeholder="first name" required/>
+      <input type="text" placeholder="last name" required/>
+      <textarea placeholder="bio"></textarea>
+      <input type="submit"/>
+    </form>
+  </SignInUpCommon>
 }
 
 export default SignUp

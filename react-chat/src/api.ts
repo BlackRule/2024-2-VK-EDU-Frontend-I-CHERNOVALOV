@@ -79,8 +79,8 @@ type RegisterPostInput = {
   'password': string,
   'username': string
 }
-type ChatInput = Omit<ChatCommon,'id'> & { is_private: true, members: [string] } |
-  { is_private: false, members: string[] } & Avatar<File>
+type ChatInput = Omit<ChatCommon,'id'> & ({ is_private: true, members: [string] } |
+  { is_private: false, members: string[] }) & Avatar<File>
 type ChatOutput = object
 
 export type ApiInputMap = {
@@ -114,7 +114,7 @@ export type ApiOutputMap = {
   'chats/GET': Paginated<Avatar<string> & CreatedUpdatedAt & ChatCommon &
     {
       creator: User,
-      last_message: API_Message
+      last_message?: API_Message
     } & { members: User[] }>,
   'chats/POST': ChatOutput,
   'messages/GET': Paginated<API_Message>,
@@ -132,12 +132,11 @@ export async function api<K extends keyof ApiInputMap>(
   /* global RequestInit */
   const init: RequestInit = {
     headers: {
-      'Content-Type': 'application/json',/*или 'multipart/form-data'*/
+      'Content-Type': 'application/json'
     }
   }
   init.method = url.match(/GET|POST/)![0]
   if (url !== 'auth/POST')
-    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
     /* @ts-expect-error */
     init.headers.Authorization = `Bearer ${localStorage.getItem(ACCESS_TOKEN_LS_KEY)}`
 
@@ -146,22 +145,20 @@ export async function api<K extends keyof ApiInputMap>(
   url_ = `${API_BASE}/${url_}`
   if ('id' in data) {
     url_ += `${data.id}/`
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     delete data.id
   }
   //todo
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   if (init.method === 'GET') { // @ts-expect-error
     url_ += `?${new URLSearchParams(data)}`
   }
   if (init.method === 'POST' || init.method === 'PUT' || init.method === 'PATCH')
     init.body = JSON.stringify(data)
-  /*  if(log) {
+    if(log) {
     console.groupCollapsed('%csent', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), url)
     console.trace(init)
     console.groupEnd()
-  }*/
+  }
   const promise = fetch(url_, init)
     .then(res => {
       return res.json()
@@ -175,10 +172,12 @@ export async function api<K extends keyof ApiInputMap>(
     cnt++
   }
   promise.then(r => {
-    //todo
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    gen_ApiOutputMap[url].check(r)
+    try {
+      // @ts-expect-error
+      gen_ApiOutputMap[url].check(r)
+    } catch (e) {
+      console.warn(e)
+    }
   })
   return promise
 

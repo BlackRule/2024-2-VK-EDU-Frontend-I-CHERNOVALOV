@@ -6,6 +6,7 @@ import Chat from 'screens/chat/Chat.tsx'
 import Chats from 'screens/chats/Chats.tsx'
 import './App.css'
 import NewChat from 'screens/newChat/NewChat.tsx'
+import NewGroupChat from 'screens/newGroupChat/NewGroupChat.tsx'
 import Profile from 'screens/profile/Profile.tsx'
 import SignIn from 'screens/signIn/SgnIn.tsx'
 import SignUp from 'screens/signUp/SignUp.tsx'
@@ -47,7 +48,6 @@ function useCentrifuge(userId:string|null){
     }
 
     const centrifuge = new Centrifuge('wss://vkedu-fullstack-div2.ru/connection/websocket/', {
-      // debug: true,
       getToken: (ctx) =>
         new Promise((resolve, reject) =>
           api('centrifugo/connect/POST', ctx)
@@ -80,8 +80,6 @@ function useCentrifuge(userId:string|null){
 }
 
 function App() {
-  // const defaultData:MessagesWithNeedsScroll[]
-  // const [data, setData] = useLocalStorage(defaultData)
   const [userId, setUserId] = useState<null|string>(localStorage.getItem(USER_ID_LS_KEY))
 
   const [addCallbackForCentrifuge,removeCallbackForCentrifuge]=useCentrifuge(userId)
@@ -105,6 +103,10 @@ function App() {
     {
       element: <NewChat/>,
       path: paths.newChat
+    },
+    {
+      element: <NewGroupChat/>,
+      path: paths.newGroupChat
     },
     {
       element: <SignUp/>,

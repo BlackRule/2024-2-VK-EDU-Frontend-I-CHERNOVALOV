@@ -21,7 +21,6 @@ function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
       // Reset rows attribute to get accurate scrollHeight
       textarea.setAttribute('rows', '1')
 
-      // Get the computed values object reference
       const cs = getComputedStyle(textarea)
 
       // Force content-box for size accurate line-height calculation

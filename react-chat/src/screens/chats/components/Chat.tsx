@@ -18,10 +18,10 @@ function Chat({name, time, state, image, count, id, image_attachment_alt,text}: 
     badge = <div className={cn(styles.badge, styles.new)}>{count}</div>
     break
   case 'unread':
-    badge = <MaterialSymbol symbol='done_all' className={cn(styles.badge, styles.unread)}/>
+    badge = <MaterialSymbol symbol='check' className={cn(styles.badge, styles.unread)}/>
     break
   case 'read':
-    badge = <MaterialSymbol symbol='check' className={cn(styles.badge, styles.read)}/>
+    badge = <MaterialSymbol symbol='done_all' className={cn(styles.badge, styles.read)}/>
     break
   case 'mention':
     badge = <div className={cn(styles.badge, styles.mention)}>{count}</div>
@@ -35,7 +35,7 @@ function Chat({name, time, state, image, count, id, image_attachment_alt,text}: 
   if (text) text_ = text
   return <>
     <Link className={styles.chat} to={paths.chat(id)}>
-      <img src={image} alt="avatar"/>
+      {image?<img src={image} alt="avatar"/>:<MaterialSymbol symbol='person' hoverable={false}/>}
       <div className={styles.body}>
         <div className={styles.top}>
           <div className={styles.name}>{name}</div>

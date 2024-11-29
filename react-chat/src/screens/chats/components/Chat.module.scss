@@ -6,13 +6,17 @@
     transition-timing-function: linear;
     transition-duration: 0.3s;
     cursor: pointer;
+    align-items: center;
     & *{
         cursor: pointer;
     }
-    padding: {
-        top: 10px;
-        bottom: 10px;
-    }
+
+ & {
+  padding: {
+    top: 10px;
+    bottom: 10px;
+  }
+}
   @include common.mobile-breakpoint {
     & {
       padding: {

@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react'
 import {defineConfig} from 'vite'
 
 // https://vite.dev/config/
+
 const c = {
   base: '/2024-2-VK-EDU-Frontend-I-Chernovalov',
   css: {
@@ -18,7 +19,8 @@ const c = {
       'screens': '/src/screens',
       '~': '/src',
     },
-  }
+  },
+
 }
 export default defineConfig(({command}) => {
   if (command === 'serve') {

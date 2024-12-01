@@ -1,6 +1,7 @@
 import {Static} from 'runtypes'
 import {gen_ApiOutputMap} from '~/api_generated.ts'
 import {ACCESS_TOKEN_LS_KEY} from '~/common.ts'
+import {DistributiveOmit} from '~/ts workarounds.ts'
 
 export type CallbackForCentrifuge = (data: {
   event: 'create' | 'update' | 'delete',
@@ -25,7 +26,7 @@ const colors = ['#c9578c',
   '#9b9d3f',
   '#c96840']
 const API_BASE = 'https://vkedu-fullstack-div2.ru/api'
-export type PartialPick<T, F extends keyof T> = Omit<T, F> & Partial<Pick<T, F>>;
+export type PartialPick<T, F extends keyof T> = DistributiveOmit<T, F> & Partial<Pick<T, F>>;
 export type User = {
   avatar: string,
   bio: string,
@@ -79,7 +80,8 @@ type RegisterPostInput = {
   'password': string,
   'username': string
 }
-type ChatInput = Omit<ChatCommon,'id'> & ({ is_private: true, members: [string] } |
+
+type ChatInput = DistributiveOmit<ChatCommon,'id'> & ({ is_private: true, members: [string] } |
   { is_private: false, members: string[] }) & Avatar<File>
 type ChatOutput = object
 

@@ -3,10 +3,11 @@ import {Link} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import {paths} from '~/App.tsx'
 import {Message} from '~/common.ts'
+import {DistributiveOmit} from '~/ts workarounds.ts'
 import styles from './Chat.module.scss'
 
 
-export type ChatProps = Omit<Message, 'text'>
+export type ChatProps = DistributiveOmit<Message, 'text'>
   & { image?: string, }
   & ({ count?: never, state: 'unread' | 'read', } | { count: number, state: 'new' | 'mention', })
   & ({ image_attachment_alt?:never,text: Message['text'] } | { image_attachment_alt: string,text?:never })

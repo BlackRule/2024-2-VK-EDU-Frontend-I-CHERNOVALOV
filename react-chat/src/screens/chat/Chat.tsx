@@ -1,4 +1,4 @@
-import {KeyboardEventHandler, RefObject, useEffect, useRef, useState} from 'react'
+import {KeyboardEventHandler, RefObject, useCallback, useEffect, useRef, useState} from 'react'
 import {Link, useNavigate, useParams} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
@@ -105,14 +105,25 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   const [data, setData] = useState<Message[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   useAutosize(textareaRef)
-
+  const fileInputRef = useRef<HTMLInputElement& { files: FileList }>(null)
+  const [filesURLs, setFilesURLs] = useState<string[]>([])
   async function sendMessage() {
     if (textareaRef.current === null) return
+    if (fileInputRef.current === null) return
     const textarea = textareaRef.current
-    if (textarea.value.trim().length === 0) return
-    await api('messages/POST',{chat:chatId,text: textarea.value})
+    const fileInput = fileInputRef.current
+    if (textarea.value.trim().length === 0 && fileInput.files.length===0) return
+    await api('messages/POST',{chat:chatId,files:fileInput.files, text: textarea.value},true,true)
   }
 
+  const filesOnChange: React.ChangeEventHandler<HTMLInputElement>=useCallback((event) => {
+    if(event!.target!.files===null) return
+    const a=[]
+    for (const file of event!.target!.files) {
+      a.push(URL.createObjectURL(file))
+    }
+    setFilesURLs(a)
+  },[])
   const textareaOnKeypress: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
     if (
       e.key !== 'Enter' ||
@@ -125,6 +136,7 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   const callbackForCentrifuge=useRef<CallbackForCentrifuge>((data)=>{
     console.log(data)
     setData((prevData) => {
+      // @ts-expect-error
       const t = [...prevData, messageAdapter(data.message)] as  MessagesWithNeedsScroll
       t.needsScroll=true
       if (textareaRef.current === null) return t
@@ -154,22 +166,7 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
       }
     )
   }).current
-  const imageOnClick=useRef<React.MouseEventHandler<HTMLSpanElement>>(()=>{
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.multiple = true
-    input.onchange = (event) => {
-      const target = event.target as HTMLInputElement
-      if (target.files) {
-        api('messages/POST',{chat:chatId,files:target.files,text:'text'},true,true)
-        input.remove()
-      }
-    }
-    input.click()
 
-
-  }).current
 
   useEffect(() => {
     const callbackId=addCallbackForCentrifuge(callbackForCentrifuge)
@@ -181,6 +178,7 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   useEffect(() => {
     (async()=>
       setData(arrayAdapter(
+        // @ts-expect-error
         (await api('messages/GET',{chat:chatId})).results,messageAdapter
       ))
     )()
@@ -202,11 +200,17 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
       </Topbar>
       <ScreenBottom>
         <Messages data={data}/>
+        <div className={styles.imageAttachments} title="to remove images click attach and click cancel">
+          {filesURLs.map((fileURL) => <img key={fileURL} src={fileURL}/>)}
+        </div>
         <div className={styles.form}>
           <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
             onKeyPress={textareaOnKeypress} ref={textareaRef}></textarea>
-          {/*<MaterialSymbol symbol='attachment'/>*/}
-          <MaterialSymbol symbol='image' onClick={imageOnClick}/>
+          <label>
+            <input ref={fileInputRef} type="file" accept="image/*" multiple 
+              style={{display:'none'}} onChange={filesOnChange}/>
+            <MaterialSymbol symbol="image"/>
+          </label>
           <MaterialSymbol symbol='location_on' onClick={locationOnClick}/>
           <button onClick={sendMessage}><MaterialSymbol symbol='send'/></button>
         </div>

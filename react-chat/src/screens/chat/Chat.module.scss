@@ -28,6 +28,13 @@
     font-size: 0.8em;
 }
 
+.imageAttachments{
+    display: flex;
+}
+.imageAttachments>img{
+    max-height: 50px;
+}
+
 .form {
     display: flex;
     align-items: center;

@@ -1,5 +1,6 @@
+import * as rt from 'runtypes'
 import {Static} from 'runtypes'
-import {gen_ApiOutputMap} from '~/api_generated.ts'
+import {FileRt, gen_ApiOutputMap} from '~/api_generated.ts'
 import {ACCESS_TOKEN_LS_KEY} from '~/common.ts'
 import {DistributiveOmit} from '~/ts workarounds.ts'
 
@@ -40,20 +41,19 @@ export type User = {
 export type UserOptional = PartialPick<User, 'avatar' | 'bio'>
 type CreatedUpdatedAt = {
   created_at: string,
-  updated_at?: string
+  updated_at: string|null
 }
-type API_MessageCommon = {
-  files: { item: string }[],
+export type API_MessageCommon = {
+  files: Static<typeof FileRt>[],
   id: string,
   text/*todo depends on voice?*/: string,
-  voice?: string/*todo NoVoiceMessage must contain text !*/
+  voice: string|null/*todo NoVoiceMessage must contain text !*/
 } & CreatedUpdatedAt
 type API_MessageWithId = { id: string, } & API_MessageCommon
 export type API_Message =
   API_MessageWithId
-  & { sender: User, was_read_by: User[] }
+  & { sender: User, was_read_by: User[]|null }
   & CreatedUpdatedAt
-type Auth = { access: string, refresh: string };
 type UserGetInput = { id: 'current' | string }
 type GetInput = {
   page?: number,
@@ -96,7 +96,7 @@ export type ApiInputMap = {
   'messages/GET': GetInput & {/*chatId*/chat/*chatId*/: string },
   'messages/POST': {
     chat: string,
-    files?: File[],
+    files?: FileList|null,
     text?: string,
     voice?: File
   },
@@ -105,30 +105,40 @@ export type ApiInputMap = {
   'users/GET': GetInput
 }
 export type ApiOutputMap = {
-  'auth/POST': Auth
-  'centrifugo/connect/POST': { token: string }
-  'centrifugo/subscribe/POST': { token: string }
-  'chat/GET': Avatar<string> & CreatedUpdatedAt & ChatCommon &
+  'auth/POST': Static<typeof gen_ApiOutputMap['auth/POST']>
+  'centrifugo/connect/POST': Static<typeof gen_ApiOutputMap['centrifugo/connect/POST']>
+  'centrifugo/subscribe/POST': Static<typeof gen_ApiOutputMap['centrifugo/subscribe/POST']>
+   'chat/GET':
+   Avatar<string> & CreatedUpdatedAt & ChatCommon &
     {
       creator: User,
       last_message: object
-    } & { members: User[] },
-  'chats/GET': Paginated<Avatar<string> & CreatedUpdatedAt & ChatCommon &
+    } & { members: User[] }
+  ,
+  'chats/GET': Static<typeof gen_ApiOutputMap['chats/GET']>
+    /*Paginated<Avatar<string> & CreatedUpdatedAt & ChatCommon &
     {
       creator: User,
       last_message: API_Message
-    } & { members: User[] }>,
+    } & { members: User[] }>*/
+  ,
   'chats/POST': ChatOutput,
-  'messages/GET': Paginated<API_Message>,
-  'messages/POST': { chat: string } & API_Message,
+  'messages/GET': Static<typeof gen_ApiOutputMap['messages/GET']>
+  /*Paginated<API_Message>*/
+  ,
+  'messages/POST': Static<typeof gen_ApiOutputMap['messages/POST']>
+  /*{ chat: string } & API_Message*/
+  ,
   'register/POST': User,
-  'user/GET': UserOptional,
+  'user/GET': Static<typeof gen_ApiOutputMap['user/GET']>
+  /*UserOptional*/
+  ,
   'users/GET': Paginated<User>,
 }
 
 
 export async function api<K extends keyof ApiInputMap>(
-  url: K,
+  intent: K,
   data: ApiInputMap[K], logSend = false,logReceive = false
 ): Promise<ApiOutputMap[K]> {
   /* global RequestInit */
@@ -140,28 +150,29 @@ export async function api<K extends keyof ApiInputMap>(
       'Content-Type': 'application/json',
     }
   }
-  init.method = url.match(/GET|POST/)![0]
-  if (url !== 'auth/POST')
+  init.method = intent.match(/GET|POST/)![0]
+  if (intent !== 'auth/POST')
     /* @ts-expect-error */
     init.headers.Authorization = `Bearer ${localStorage.getItem(ACCESS_TOKEN_LS_KEY)}`
 
 
-  let url_ = url.replace(/(GET|POST)/, '')
-  url_ = `${API_BASE}/${url_}`
+  let url = intent.replace(/(GET|POST)/, '')
+  url = `${API_BASE}/${url}`
   if ('id' in data) {
-    url_ += `${data.id}/`
+    url += `${data.id}/`
     // @ts-expect-error
     delete data.id
   }
   //todo
   if (init.method === 'GET') { // @ts-expect-error
-    url_ += `?${new URLSearchParams(data)}`
+    url += `?${new URLSearchParams(data)}`
   }
   // Максимальный размер body реквеста - 10MB
-  if('files' in data){
+  if('files' in data && data.files){
     init.body=new FormData()
     for (const dataKey in data) {
       if (dataKey === 'files') continue
+      // @ts-expect-error
       init.body.append(dataKey, data[dataKey])
     }
     for (const file of data.files) {
@@ -172,17 +183,17 @@ export async function api<K extends keyof ApiInputMap>(
   else if (init.method === 'POST' || init.method === 'PUT' || init.method === 'PATCH')
     init.body = JSON.stringify(data)
   if(logSend) {
-    console.groupCollapsed('%csent', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), url)
+    console.groupCollapsed('%csent', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), intent)
     console.trace(init)
     console.groupEnd()
   }
-  const promise = fetch(url_, init)
+  const promise = fetch(url, init)
     .then(res => {
       return res.json()
     })
   if (logReceive) {
     promise.then((cnt => (r => {
-      console.groupCollapsed('%creceived', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), url)
+      console.groupCollapsed('%creceived', `color: white; background-color: ${colors[cnt % colors.length]}`, cnt, getCurrentDateTime(), intent)
       console.log(r)
       console.groupEnd()
     }))(cnt))
@@ -191,9 +202,9 @@ export async function api<K extends keyof ApiInputMap>(
   promise.then(r => {
     try {
       // @ts-expect-error
-      gen_ApiOutputMap[url].check(r)
+      gen_ApiOutputMap[intent].check(r)
     } catch (e) {
-      console.warn(e)
+      console.warn(intent,e)
     }
   })
   return promise

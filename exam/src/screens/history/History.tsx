@@ -18,9 +18,9 @@ function History() {
       </button>
     </div>
     <div className={styles.bottom}>
-      {history.map((item) =>
-        <div key={`${item.l1}${item.l2}${item.i}`} className={styles.entry}>
-          //todo item.l1 when was autodetected
+      {history.map((item,index) =>
+        <div key={`${item.l1}${item.l2}${item.i}${index}`} className={styles.entry}>
+          {/* todo item.l1 when was autodetected */}
           <div>{item.l1}-&gt;{languages[item.l2]}</div>
           <div>{item.i}</div>
           <div>{item.o}</div>

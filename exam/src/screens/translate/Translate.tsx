@@ -29,9 +29,9 @@ function Translate() {
   }
 
 
-  const [language1,language2,output,setInput,setLanguage1,setLanguage2] =
+  const [language1,language2,input,output,setInput,setLanguage1,setLanguage2] =
     useAppStore(useShallow((state) =>
-      [state.language1,state.language2,state.output,state.setInput,state.setLanguage1,state.setLanguage2])
+      [state.language1,state.language2,state.input,state.output,state.setInput,state.setLanguage1,state.setLanguage2])
     )
 
   const textareaOnKeypress: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
@@ -63,7 +63,7 @@ function Translate() {
       </div>
       <div>Press enter in the first field to translate</div>
       <div className={styles.bottom}>
-        <textarea ref={textareaRef} onKeyPress={textareaOnKeypress}/>
+        <textarea defaultValue={input} ref={textareaRef} onKeyPress={textareaOnKeypress}/>
         <textarea readOnly value={output}/>
       </div>
       

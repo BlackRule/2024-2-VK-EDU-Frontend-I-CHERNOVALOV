@@ -1,0 +1,32 @@
+{
+    "responseData": {
+        "translatedText": "Тест",
+        "match": 0.85,
+        "detectedLanguage": "lv"
+    },
+    "quotaFinished": false,
+    "mtLangSupported": null,
+    "responseDetails": "",
+    "responseStatus": 200,
+    "responderId": null,
+    "exception_code": null,
+    "matches": [
+        {
+            "id": 0,
+            "segment": "Тест",
+            "translation": "Тест",
+            "source": false,
+            "target": "en-GB",
+            "quality": 70,
+            "reference": "Machine Translation.",
+            "usage-count": 2,
+            "subject": false,
+            "created-by": "MT!",
+            "last-updated-by": "MT!",
+            "create-date": "2024-12-23 17:16:20",
+            "last-update-date": "2024-12-23 17:16:20",
+            "match": 0.85,
+            "model": "neural"
+        }
+    ]
+}

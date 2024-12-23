@@ -9,17 +9,22 @@ function History() {
   const navigate=useNavigate()
   const history = useAppStore( useShallow((state) =>state.history))
     
-  return <>History
-    <button onClick={() => navigate(paths.translate)}><MaterialSymbol symbol="arrow_back" className={styles.compose}/>
-    </button>
-    {history.map((item) => 
-      <div key={`${item.l1}${item.l2}${item.i}`}>
-        <div>{item.l1}-&gt;{item.l2}</div>
-        <div>{item.i}</div>
-        <div>{item.o}</div>
-      </div>
-    )}
-  </>
+  return <div className={styles.body}>
+    <div className={styles.top}>
+      <span>History</span>
+      <button onClick={() => navigate(paths.translate)}><MaterialSymbol symbol="arrow_back" className={''}/>
+      </button>
+    </div>
+    <div className={styles.bottom}>
+      {history.map((item) =>
+        <div key={`${item.l1}${item.l2}${item.i}`} className={styles.entry}>
+          <div>{item.l1}-&gt;{item.l2}</div>
+          <div>{item.i}</div>
+          <div>{item.o}</div>
+        </div>
+      )}
+    </div>
+  </div>
 }
 
 export default History

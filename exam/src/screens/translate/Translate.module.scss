@@ -1,3 +1,7 @@
 .top,.bottom{
   display: flex;
 }
+.bottom textarea{
+  min-width: 150px;
+  min-height: 150px;
+}

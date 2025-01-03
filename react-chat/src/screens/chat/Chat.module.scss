@@ -30,14 +30,23 @@
 
 .imageAttachments{
     display: flex;
+    min-width: 100%;
+    flex-direction: column;
 }
-.imageAttachments>img{
+.imageAttachments>div{
+    display: flex;
+    min-width: 100%;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+.imageAttachments>div>img{
     max-height: 50px;
 }
 
 .form {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     border: 1px solid rgba(25, 25, 25, 0.32);
 }
 
@@ -49,4 +58,35 @@
     font-size: 1rem;
     line-height: 1.5rem;
     padding: .375rem;
+}
+
+.indicator{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    display: none;
+    background-color: white;
+    min-height: 60%;
+    min-width: 60%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+}
+
+.FileDropHovered .indicator{
+    display: flex;
+}
+
+.audio{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 50px;
+    & audio{
+        flex-grow: 1;
+        width: auto;
+    }
 }

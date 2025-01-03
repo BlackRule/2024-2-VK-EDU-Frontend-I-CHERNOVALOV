@@ -2,7 +2,7 @@ import cn from 'classnames'
 import styles from './MaterialSymbol.module.scss'
 
 type Symbol = 'arrow_back' | 'person' | 'send' | 'attachment' | 'more_vert' | 'search' | 'menu' | 'edit' | 'check' |
-  'done_all' | 'photo_camera' | 'location_on' | 'image';
+  'done_all' | 'photo_camera' | 'location_on' | 'image' | 'mic' | 'stop_circle' | 'delete_forever';
 
 const MaterialSymbol = ({symbol, hoverable = true, ...props}:
   { hoverable?: boolean, symbol: Symbol } & React.HTMLAttributes<HTMLSpanElement>) => {

@@ -7,7 +7,7 @@ import {paths} from '~/App.tsx'
 import styles from './Profile.module.scss'
 
 const Profile = () => {
-  const backgroundImage = 'chat_images/5.png'
+  const backgroundImage = ''
   return <Screen>
     <Topbar>
       <Link to={paths.chats}><MaterialSymbol symbol='arrow_back'/></Link>

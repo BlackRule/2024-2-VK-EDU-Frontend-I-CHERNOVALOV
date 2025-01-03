@@ -65,7 +65,6 @@ function useCentrifuge(userId:string|null){
     })
     subscription.on('publication', function (ctx) {
       callbacksForCentrifuge.forEach(cb=>cb(ctx.data))
-
     })
     subscription.subscribe()
     centrifuge.connect()

@@ -22,11 +22,15 @@ const MessageRt = rt.Record({
   files: rt.Array(FileRt),
   id: rt.String,
   sender: UserRt,
-  text: rt.String,
   updated_at: rt.Null.Or(rt.String),
-  voice: rt.Null,
   was_read_by: rt.Null.Or(rt.Array(UserRt)),
-})
+}).And(rt.Record({
+  text: rt.String,
+  voice: rt.Null,
+}).Or(rt.Record({
+  text: rt.Null,
+  voice: rt.String,
+})))
 
 const PagedResultsRt=<T>(Rt:rt.Runtype<T>)=> rt.Record({
   count: rt.Number,

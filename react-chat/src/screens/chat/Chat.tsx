@@ -1,4 +1,7 @@
-import {KeyboardEventHandler, RefObject, useCallback, useEffect, useRef, useState} from 'react'
+import cn from 'classnames'
+import {IMediaRecorder, MediaRecorder, register} from 'extendable-media-recorder'
+import {connect} from 'extendable-media-recorder-wav-encoder'
+import {DragEvent, KeyboardEventHandler, RefObject, useCallback, useEffect, useRef, useState} from 'react'
 import {Link, useNavigate, useParams} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import Topbar from 'components/Topbar/Topbar.tsx'
@@ -8,10 +11,7 @@ import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import ScreenBottom from 'screens/components/ScreenBottom/ScreenBottom.tsx'
 import {paths} from '~/App.tsx'
 import {AddCallbackForCentrifuge, api, CallbackForCentrifuge, RemoveCallbackForCentrifuge} from '~/api.ts'
-import {
-  messageAdapter,
-  Message, arrayAdapter,
-} from '~/common.ts'
+import {arrayAdapter, Message, messageAdapter,} from '~/common.ts'
 import styles from './Chat.module.scss'
 
 function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
@@ -82,6 +82,7 @@ function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
 
     return textareaOnInput
   }
+
   const autosizeFnThatNeedsCleanup = useRef<(() => void) | null>(null)
   useEffect(() => {
     if (textareaRef.current === null) return
@@ -94,66 +95,258 @@ function useAutosize(textareaRef: RefObject<HTMLTextAreaElement>) {
   }, [textareaRef])
 }
 
-function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCallbackForCentrifuge: AddCallbackForCentrifuge,removeCallbackForCentrifuge:RemoveCallbackForCentrifuge }) {
-  const navigate=useNavigate()
-  const _chatId = useParams<{chatId: string}>().chatId
-  if(!_chatId) {
+function addFiles(filesToAdd: FileList,
+  setFilesURLs: React.Dispatch<React.SetStateAction<string[]>>,
+  files: File[]) {
+  for (const file of filesToAdd) files.push(file)
+  setFilesURLs((files) => {
+    const a = [...files]
+    for (const file of filesToAdd) a.push(URL.createObjectURL(file))
+    return a
+  })
+}
+
+function removeFile(fileIdx: number, files: File[],
+  setFilesURLs: React.Dispatch<React.SetStateAction<string[]>>) {
+  setFilesURLs((filesURLs) => {
+    const a = [...filesURLs]
+    files.splice(fileIdx, 1)
+    URL.revokeObjectURL(a[fileIdx])
+    a.splice(fileIdx, 1)
+    return a
+  })
+
+}
+
+function getValidImageFiles(
+  fileItems: Array<File | DataTransferItem>,
+  isDragEvent: boolean = false
+): FileList {
+  const fileList = new DataTransfer()
+
+  fileItems.forEach((item) => {
+    let file: File | null
+
+    if (isDragEvent && 'getAsFile' in item) {
+      file = item.getAsFile()
+    } else if (item instanceof File) {
+      file = item
+    } else {
+      file = null
+    }
+
+    if (file && file.type.startsWith('image/')) {
+      fileList.items.add(file)
+    }
+  })
+
+  return fileList.files
+}
+
+function useDragAndDrop(setFilesURLs: React.Dispatch<React.SetStateAction<string[]>>, files: File[]) {
+  const [isOver, setIsOver] = useState(false)
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsOver(true)
+  }
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsOver(false)
+  }
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsOver(false)
+    const validFiles = getValidImageFiles(Array.from(event.dataTransfer.items), true)
+    addFiles(validFiles, setFilesURLs, files)
+  }
+
+  return {
+    handleDragLeave,
+    handleDragOver,
+    handleDrop,
+    isOver
+  }
+
+}
+
+function useRecording() {
+  const [mediaRecorder, setMediaRecorder] = useState<IMediaRecorder | null>(null)
+  const dataRef = useRef<{ audioChunks: Blob[], stream: MediaStream | void }>(
+    {audioChunks: [], stream: undefined})
+  const startRecording = async () => {
+    if (mediaRecorder !== null) return
+    dataRef.current.stream = await navigator.mediaDevices.getUserMedia({audio: true}).catch((e) => {
+      switch (e.name) {
+      case 'NotAllowedError':
+        alert('Вы не разрешили использовать микрофон')
+        break
+      case 'NotFoundError':
+        alert('Микрофон не найден')
+      }
+    })
+    if (!dataRef.current.stream) return
+    try {
+      await register(await connect())
+    } catch (e) {
+      //todo fixme mb second+ time doing it
+    }
+    setMediaRecorder(() => {
+      const mr = new MediaRecorder(dataRef.current.stream!, {mimeType: 'audio/wav'})
+      dataRef.current.audioChunks = []
+      mr.ondataavailable = (event) => {
+        dataRef.current.audioChunks.push(event.data)
+      }
+      mr.start()
+      return mr
+    })
+  }
+
+  const stopRecording = async () => {
+    if (mediaRecorder === null) return
+    dataRef.current.stream!.getTracks().forEach((track) => track.stop())
+    const promise = new Promise<File>((resolve) =>
+      mediaRecorder!.onstop = () => {
+        setMediaRecorder(null)
+        resolve(new File(dataRef.current.audioChunks, 'voice.wav', {type: 'audio/wav'}))
+      })
+    mediaRecorder.stop()
+    return await promise
+  }
+
+  return {
+    isRecording: mediaRecorder !== null,
+    startRecording,
+    stopRecording,
+  }
+}
+
+
+function Chat({addCallbackForCentrifuge, removeCallbackForCentrifuge}: {
+  addCallbackForCentrifuge: AddCallbackForCentrifuge,
+  removeCallbackForCentrifuge: RemoveCallbackForCentrifuge
+}) {
+  const navigate = useNavigate()
+  const _chatId = useParams<{ chatId: string }>().chatId
+  if (!_chatId) {
     navigate(paths.chats)
     //todo Will execution get terminated here?
   }
-  const chatId=_chatId as string
+  const chatId = _chatId as string
   const [data, setData] = useState<Message[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   useAutosize(textareaRef)
-  const fileInputRef = useRef<HTMLInputElement& { files: FileList }>(null)
+  useRef<HTMLInputElement & { files: FileList }>(null)
   const [filesURLs, setFilesURLs] = useState<string[]>([])
+  const filesRef = useRef([])
+  const {handleDragOver, handleDragLeave, handleDrop, isOver} = useDragAndDrop(setFilesURLs, filesRef.current)
+  const {isRecording, startRecording, stopRecording: _stopRecording} = useRecording()
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const audioFileRef = useRef<File | null>(null)
+  const [isMessageTextPresent, setIsMessageTextPresent] = useState(false)
+
   async function sendMessage() {
-    if (textareaRef.current === null) return
-    if (fileInputRef.current === null) return
-    const textarea = textareaRef.current
-    const fileInput = fileInputRef.current
-    if (textarea.value.trim().length === 0 && fileInput.files.length===0) return
-    await api('messages/POST',{chat:chatId,files:fileInput.files, text: textarea.value},true,true)
-  }
-
-  const filesOnChange: React.ChangeEventHandler<HTMLInputElement>=useCallback((event) => {
-    if(event!.target!.files===null) return
-    const a=[]
-    for (const file of event!.target!.files) {
-      a.push(URL.createObjectURL(file))
+    await stopRecording()
+    if(audioFileRef.current!==null){
+      await api('messages/POST', {
+        chat: chatId,
+        voice: audioFileRef.current
+      }, true, true)
+      removeRecording()
+      return
     }
-    setFilesURLs(a)
-  },[])
-  const textareaOnKeypress: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
-    if (
-      e.key !== 'Enter' ||
-      e.key === 'Enter' && (e.shiftKey || e.ctrlKey)
-    ) return
-    e.preventDefault()
-    sendMessage()
+
+    if (textareaRef.current === null) return
+    const textarea = textareaRef.current
+    if (textarea.value.trim().length === 0 && filesRef.current.length === 0) return
+    await api('messages/POST', {
+      chat: chatId,
+      files: filesRef.current,
+      text: textarea.value,
+    }, true, true)
+    setFilesURLs(() => {
+      for (let i = 0; i < filesRef.current.length; i++) {
+        URL.revokeObjectURL(filesRef.current[i])
+      }
+      filesRef.current = []
+      return []
+    })
+    textarea.value = ''
+    textarea.dispatchEvent(new Event('input', {
+      bubbles: true
+    }))
   }
 
-  const callbackForCentrifuge=useRef<CallbackForCentrifuge>((data)=>{
+  async function stopRecording() {
+    const file = await _stopRecording()
+    if (file === undefined) return
+    audioFileRef.current = file
+    setAudioUrl(URL.createObjectURL(file))
+  }
+
+  const filesOnChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
+    if (event!.target!.files === null) return
+    const validFiles = getValidImageFiles(Array.from(event.target.files))
+    addFiles(validFiles, setFilesURLs, filesRef.current)
+  }, [])
+
+  const callbackForCentrifuge = useRef<CallbackForCentrifuge>((data) => {
     console.log(data)
-    setData((prevData) => {
-      // @ts-expect-error
-      const t = [...prevData, messageAdapter(data.message)] as  MessagesWithNeedsScroll
-      t.needsScroll=true
-      if (textareaRef.current === null) return t
-      const textarea = textareaRef.current
-      textarea.value = ''
-      textarea.dispatchEvent(new Event('input', {
-        bubbles: true
-      }))
-      return t
-    })
+    switch (data.event){
+    case 'create':
+      break//todo
+    case 'update':
+      break//todo
+    case 'delete':
+      break//todo
+
+    }
+    if (data.message.chat !== chatId) {
+      try{
+        if (Notification.permission === 'granted') {
+          new Notification('Новое сообщение', {
+            body: `У вас новое сообщение в чате: ${data.message.chat}`,
+            silent: false,
+          })
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification('Новое сообщение', {
+                // todo chat name not id
+                body: `У вас новое сообщение в чате: ${data.message.chat}`,
+                silent: false,
+              })
+            }
+          })
+        }
+      } catch (e){
+        alert(`У вас новое сообщение в чате: ${data.message.chat}`)
+      }
+
+      const sound = new Audio('/notification-sound.wav')
+      sound.play().catch(err => console.error('Failed to play sound:', err))
+
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200])
+      } else {
+        console.warn('Vibration API is not supported by this device or browser.')
+      }
+      console.log('done')
+    }else {
+      setData((prevData) => {
+        const t = [...prevData, messageAdapter(data.message)] as MessagesWithNeedsScroll
+        return t
+
+      })
+    }
   }).current
 
-  const locationOnClick=useRef<React.MouseEventHandler<HTMLSpanElement>>(()=>{
+  const locationOnClick = useRef<React.MouseEventHandler<HTMLSpanElement>>(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const {latitude, longitude} = position.coords
-        api('messages/POST',{chat:chatId,text: `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`})
+        api('messages/POST', {chat: chatId, text: `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`})
       },
       (error) => {
         //todo
@@ -167,19 +360,23 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
     )
   }).current
 
+  const removeRecording = () => {
+    audioFileRef.current = null
+    URL.revokeObjectURL(audioUrl!)
+    setAudioUrl(null)
+  }
 
   useEffect(() => {
-    const callbackId=addCallbackForCentrifuge(callbackForCentrifuge)
-    return ()=>{
+    const callbackId = addCallbackForCentrifuge(callbackForCentrifuge)
+    return () => {
       removeCallbackForCentrifuge(callbackId)
     }
   }, [])
 
   useEffect(() => {
-    (async()=>
+    (async () =>
       setData(arrayAdapter(
-        // @ts-expect-error
-        (await api('messages/GET',{chat:chatId})).results,messageAdapter
+        (await api('messages/GET', {chat: chatId})).results, messageAdapter
       ))
     )()
   }, [])
@@ -187,32 +384,64 @@ function Chat({addCallbackForCentrifuge,removeCallbackForCentrifuge}:{   addCall
   return (
     <Screen>
       <Topbar>
-        <Link to={paths.chats}><MaterialSymbol symbol='arrow_back'/></Link>
+        <Link to={paths.chats}><MaterialSymbol symbol="arrow_back"/></Link>
         <Link className={styles.horizontal} to={paths.profile}>
-          <MaterialSymbol symbol='person' hoverable={false}/>
+          {/*todo*/}
+          <MaterialSymbol symbol="person" hoverable={false}/>
           <div className={styles.vertical}>
             <div className={styles.name}>Дженнифер</div>
             <div className={styles.lastSeen}>была 2 часа назад</div>
           </div>
         </Link>
-        <div><MaterialSymbol symbol='search' />
-          <MaterialSymbol symbol='more_vert' /></div>
+        <div><MaterialSymbol symbol="search"/>
+          <MaterialSymbol symbol="more_vert"/></div>
       </Topbar>
       <ScreenBottom>
-        <Messages data={data}/>
-        <div className={styles.imageAttachments} title="to remove images click attach and click cancel">
-          {filesURLs.map((fileURL) => <img key={fileURL} src={fileURL}/>)}
+        <Messages data={data} onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={cn(styles.FileDrop, {[styles.FileDropHovered]: isOver})}>
+          <div className={styles.indicator}>Drop images here to attach</div>
+        </Messages>
+        {audioUrl && <div className={styles.audio}>
+          <audio controls src={audioUrl}/>
+          <MaterialSymbol symbol={'delete_forever'} onClick={removeRecording}/>
+        </div>}
+        <div className={styles.imageAttachments}>
+          {filesURLs.length > 0 ? <div>To remove image click it</div> : null}
+          <div>{filesURLs.map((fileURL, i) => <img key={fileURL} src={fileURL}
+            onClick={() => removeFile(i, filesRef.current, setFilesURLs)}/>)}
+          </div>
         </div>
         <div className={styles.form}>
-          <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
-            onKeyPress={textareaOnKeypress} ref={textareaRef}></textarea>
-          <label>
-            <input ref={fileInputRef} type="file" accept="image/*" multiple 
-              style={{display:'none'}} onChange={filesOnChange}/>
-            <MaterialSymbol symbol="image"/>
-          </label>
-          <MaterialSymbol symbol='location_on' onClick={locationOnClick}/>
-          <button onClick={sendMessage}><MaterialSymbol symbol='send'/></button>
+          {(!audioUrl && !isRecording) && <>
+            <textarea className={styles.formInput} name="message-text" placeholder="Введите сообщение"
+              onKeyUp={(e) => {
+                if (
+                  e.key !== 'Enter' ||
+                  e.key === 'Enter' && (e.shiftKey || e.ctrlKey)
+                ) setIsMessageTextPresent(textareaRef.current!.value.trim().length !== 0)
+                else sendMessage()
+              }} 
+              onKeyDown={(e) => {
+                if (
+                  e.key !== 'Enter' ||
+                  e.key === 'Enter' && (e.shiftKey || e.ctrlKey)
+                ) return
+                e.preventDefault()
+              }}     
+              ref={textareaRef}></textarea>{/*fixme useAutosize + conditional bug Fix by turning textarea into component*/}
+            <label>
+              <input type="file" accept="image/*" multiple
+                style={{display: 'none'}} onChange={filesOnChange}/>
+              <MaterialSymbol symbol="image"/>
+            </label>
+          </>}
+          {(!isMessageTextPresent && filesURLs.length === 0) &&
+            <MaterialSymbol symbol={isRecording ? 'stop_circle' : 'mic'}
+              onClick={isRecording ? stopRecording : startRecording}/>}
+          <MaterialSymbol symbol="location_on" onClick={locationOnClick}/>
+          <button onClick={sendMessage}><MaterialSymbol symbol="send"/></button>
         </div>
       </ScreenBottom>
     </Screen>

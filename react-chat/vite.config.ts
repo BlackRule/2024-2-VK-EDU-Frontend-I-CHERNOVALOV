@@ -1,3 +1,4 @@
+import basicSsl from '@vitejs/plugin-basic-ssl'
 import react from '@vitejs/plugin-react'
 import {defineConfig} from 'vite'
 
@@ -20,11 +21,16 @@ const c = {
       '~': '/src',
     },
   },
+  server:{
+    host: true
+  },
 
 }
 export default defineConfig(({command}) => {
   if (command === 'serve') {
     c.base = ''
+    // @ts-expect-error
+    c.plugins.push(basicSsl())
     return c
   } else {
     // command === 'build'

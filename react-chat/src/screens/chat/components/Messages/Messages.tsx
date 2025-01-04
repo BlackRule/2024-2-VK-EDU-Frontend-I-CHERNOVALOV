@@ -1,3 +1,4 @@
+import cn from 'classnames'
 import {RefObject, useEffect, useRef} from 'react'
 import {MessagesWithNeedsScroll} from 'screens/chat/types.tsx'
 import Message from './components/Message/Message.tsx'
@@ -32,7 +33,7 @@ function useKeepScrollPositionOnResize(scrollableRef: RefObject<HTMLDivElement>)
 
 }
 
-const Messages = ({data}: { data: MessagesWithNeedsScroll }) => {
+const Messages = ({data,...rest}: { data: MessagesWithNeedsScroll }&React.HTMLAttributes<HTMLDivElement>) => {
   const messagesScrollableRef = useRef<HTMLDivElement>(null)
   useKeepScrollPositionOnResize(messagesScrollableRef)
 
@@ -45,7 +46,7 @@ const Messages = ({data}: { data: MessagesWithNeedsScroll }) => {
   }, [data])
 
 
-  return <div className={styles['messages-scroll']} ref={messagesScrollableRef}>
+  return <div {...rest} className={cn(styles['messages-scroll'],rest.className)} ref={messagesScrollableRef}>
     <div className={styles.messages}>
       {data.map((message) => {
         message = {...message}
@@ -54,6 +55,7 @@ const Messages = ({data}: { data: MessagesWithNeedsScroll }) => {
         />
       })}
     </div>
+    {rest.children}
   </div>
 }
 

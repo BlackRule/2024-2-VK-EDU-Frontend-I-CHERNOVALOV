@@ -3,15 +3,15 @@ import {Link} from 'react-router-dom'
 import MaterialSymbol from 'components/MaterialSymbol/MaterialSymbol.tsx'
 import {paths} from '~/App.tsx'
 import {Message} from '~/common.ts'
+import {DistributiveOmit} from '~/ts workarounds.ts'
 import styles from './Chat.module.scss'
 
 
-export type ChatProps = Omit<Message, 'text'>
-  & { image?: string, }
+export type ChatProps = DistributiveOmit<Message, 'text'|'files'>
+  & { has_image_attachment:boolean,image: string|null,text: Message['text'] }
   & ({ count?: never, state: 'unread' | 'read', } | { count: number, state: 'new' | 'mention', })
-  & ({ image_attachment_alt?:never,text: Message['text'] } | { image_attachment_alt: string,text?:never })
 
-function Chat({name, time, state, image, count, id, image_attachment_alt,text}: ChatProps) {
+function Chat({name, time, state, image, count, id, has_image_attachment,text}: ChatProps) {
   let badge = null
   switch (state) {
   case 'new':
@@ -26,13 +26,6 @@ function Chat({name, time, state, image, count, id, image_attachment_alt,text}: 
   case 'mention':
     badge = <div className={cn(styles.badge, styles.mention)}>{count}</div>
   }
-  let text_
-  if (image_attachment_alt)
-    text_ = <>
-      <MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/>
-      {image_attachment_alt}
-    </>
-  if (text) text_ = text
   return <>
     <Link className={styles.chat} to={paths.chat(id)}>
       {image?<img src={image} alt="avatar"/>:<MaterialSymbol symbol='person' hoverable={false}/>}
@@ -42,7 +35,7 @@ function Chat({name, time, state, image, count, id, image_attachment_alt,text}: 
           <div className={styles.time}>{time}</div>
         </div>
         <div className={styles.bottom}>
-          <div className={styles.text}>{text_}</div>
+          <div className={styles.text}>{has_image_attachment&&<MaterialSymbol symbol='photo_camera' hoverable={false} className={styles.photo_camera}/>}{text}</div>
           {badge}
         </div>
       </div>

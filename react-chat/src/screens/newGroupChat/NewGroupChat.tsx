@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
-import {useFilter} from 'screens/hooks.tsx'
 import Screen from 'screens/Screen.tsx'
+import {useFilter} from 'screens/hooks.tsx'
 import {api, User} from '~/api.ts'
 import styles from './NewGroupChat.module.scss'
 
@@ -8,18 +8,19 @@ const NewGroupChat = () => {
   const [selectedUserIds, setSelectedUserIds] = useState(new Set<User['id']>)
   const [users, setUsers] = useState<User[]>([])
   const [filterString, filterJSX] = useFilter()
+  const inputForTitleRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     api('users/GET', {search: filterString}).then(res => {
       setUsers(res.results)
     })
   }, [filterString])
   const create = useCallback(() => {
-    //fixme HELP ME MENTOR PLEASE Why title is not required by TS? is_private ведь false
-    api('chats/POST', {is_private:false, members: Array.from(selectedUserIds),title:'Trio'})
+    api('chats/POST', {is_private:false, members: Array.from(selectedUserIds),title:inputForTitleRef.current?.value??''})
   },[selectedUserIds])
   return <Screen>
     {filterJSX}
-    <h1>newGroupChat</h1>
+    <h1>New group chat</h1>
+    <input type="text" required placeholder={'Chat title'} ref={inputForTitleRef}/>
     <div className={styles.users}>
       {users.map((user) =>
         <label className={styles.user} key={user.id}>

@@ -10,4 +10,8 @@
 .messages {
     display: flex;
     flex-direction: column;
+    & a{
+        text-decoration: revert;
+        color: revert;
+    }
 }

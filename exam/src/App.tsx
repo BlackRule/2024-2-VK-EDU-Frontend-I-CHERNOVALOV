@@ -11,11 +11,6 @@ export const paths={
   history : '/history',
 }
 
-
-
-
-
-
 function App() {
 
   const routes = [

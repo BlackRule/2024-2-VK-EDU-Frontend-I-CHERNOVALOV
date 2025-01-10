@@ -1,0 +1,15 @@
+@mixin border-radius {
+  & {
+    border-radius: 10px;
+  }
+  @media (max-width: 368px) {
+    & {
+      border-radius: 0;
+    }
+  }
+}
+
+@mixin mobile-breakpoint {
+  @media (max-width: 368px) { @content; }
+}
+

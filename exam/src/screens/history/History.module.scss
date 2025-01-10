@@ -1,0 +1,9 @@
+.body,.top,.bottom{
+  display: flex;
+}
+.body,.bottom{
+  flex-direction: column;
+}
+.entry{
+  border-bottom: 1px solid black;
+}
